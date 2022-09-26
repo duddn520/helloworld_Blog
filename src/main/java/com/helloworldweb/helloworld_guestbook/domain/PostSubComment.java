@@ -1,5 +1,6 @@
 package com.helloworldweb.helloworld_guestbook.domain;
 
+import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,9 @@ public class PostSubComment {
     @GeneratedValue
     private Long id;
 
+    @NotNull
+    private String content;
+
     @ManyToOne
     @JoinColumn(name = "post_comment_id")
     private PostComment postComment;
@@ -21,5 +25,4 @@ public class PostSubComment {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String content;
 }

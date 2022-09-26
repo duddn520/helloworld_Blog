@@ -14,13 +14,13 @@ public class PostImage {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "blogpost_id")
-    private BlogPost blogPost;
-
     private String originalFileName;
     @NotNull
     private String storedFileName;
     @NotNull
     private String storedUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "blogpost_id")
+    private BlogPost blogPost;
 }

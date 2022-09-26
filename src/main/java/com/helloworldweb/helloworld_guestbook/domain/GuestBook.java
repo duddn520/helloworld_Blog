@@ -20,7 +20,6 @@ public class GuestBook {
     @JoinColumn(name = "user_id")
     private User user;
 
-
     @OneToMany(mappedBy = "guestBook")
-    private List<GuestBookComment> guestBookComments = new ArrayList<GuestBookComment>();
+    private List<GuestBookComment> guestBookComments = new ArrayList<>();
 }

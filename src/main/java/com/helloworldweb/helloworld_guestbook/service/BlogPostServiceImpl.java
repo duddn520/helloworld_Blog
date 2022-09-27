@@ -7,7 +7,6 @@ import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.helloworldweb.helloworld_guestbook.repository.BlogPostRepository;
 import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,9 +38,14 @@ public class BlogPostServiceImpl implements BlogPostService{
     }
 
     @Override
-    public BlogPostDto getBlogPost(Long id) {
-        BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(()-> new NoSuchElementException());
-        return new BlogPostDto(blogPost);
+    public BlogPostDto getBlogPost(Long id) throws NoSuchElementException {
+        try{
+            BlogPost blogPost = getBlogPostById(id);
+            return new BlogPostDto(blogPost);
+        }catch(NoSuchElementException e)
+        {
+            throw e;
+        }
     }
 
     @Override
@@ -50,12 +54,41 @@ public class BlogPostServiceImpl implements BlogPostService{
     }
 
     @Override
-    public BlogPostDto updateBlogPost(BlogPostDto blogPostDto) {
-        return null;
+    @Transactional
+    public BlogPostDto updateBlogPost(BlogPostDto blogPostDto) throws NoSuchElementException {
+        try {
+            BlogPost blogPost = getBlogPostById(blogPostDto.getId());
+            blogPost.updateBlogPost(blogPostDto);
+
+            BlogPost savedBlogPost = blogPostRepository.save(blogPost);
+
+            return BlogPostDto.builder()
+                    .id(savedBlogPost.getId())
+                    .title(savedBlogPost.getTitle())
+                    .content(savedBlogPost.getContent())
+                    .tags(savedBlogPost.getTags())
+                    .searchCount(savedBlogPost.getSearchCount())
+                    .views(savedBlogPost.getViews())
+                    .build();
+        }catch (NoSuchElementException e)
+        {
+            throw e;
+        }
     }
 
     @Override
-    public void deleteBlogPost(Long id) {
+    @Transactional
+    public void deleteBlogPost(Long id) throws NoSuchElementException {
+        try{
+            BlogPost blogPost = getBlogPostById(id);
+            blogPostRepository.delete(blogPost);
+        }catch (NoSuchElementException e){
+            throw e;
+        }
 
+    }
+
+    private BlogPost getBlogPostById(Long id){
+        return blogPostRepository.findById(id).orElseThrow(()->new NoSuchElementException("해당 포스트가 없습니다."));
     }
 }

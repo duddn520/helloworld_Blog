@@ -37,4 +37,15 @@ public class BlogPostDto {
         this.views = views;
     }
 
+    public BlogPost toEntity(){
+        return BlogPost.builder()
+                .id(this.id)
+                .title(this.title)
+                .content(this.content)
+                .tags(this.tags)
+                .searchCount(this.searchCount)
+                .views(this.views)
+                .build();
+    }
+
 }

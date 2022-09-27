@@ -1,5 +1,6 @@
 package com.helloworldweb.helloworld_guestbook.domain;
 
+import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,4 +55,11 @@ public class BlogPost {
         user.getBlogPosts().add(this);
     }
 
+    public void updateBlogPost(BlogPostDto blogPostDto){
+        this.title = blogPostDto.getTitle();
+        this.content = blogPostDto.getContent();
+        this.tags = blogPostDto.getTags();
+        this.searchCount = blogPostDto.getSearchCount();
+        this.views = blogPostDto.getViews();
+    }
 }

@@ -12,9 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -78,6 +80,112 @@ public class BlogPostServiceTest {
          */
         assertThat(retBlogPostDto.getUserId()).isEqualTo(user.getId());
     }
+
+    @Test
+    void 게시물등록_유저조회실패(){
+        //given
+        String email = "email@email.com";
+        BlogPost blogPost = BlogPost.builder()
+                .content("content")
+                .title("title")
+                .tags("tags")
+                .searchCount(1L)
+                .views(1L)
+                .build();
+
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .title(blogPost.getTitle())
+                .content(blogPost.getContent())
+                .tags(blogPost.getTags())
+                .searchCount(blogPost.getSearchCount())
+                .views(blogPost.getViews()).build();
+
+        //유저조회시 실패 가정
+        when(userRepository.findByEmail(any(String.class))).thenThrow(NoSuchElementException.class);
+        //when
+        //then
+        /**
+         * 유저 조회 실패시 NoSuchElementException Throw 하는지 Test
+         */
+        assertThrows(NoSuchElementException.class,()->blogPostService.addBlogPost(blogPostDto,email));
+
+    }
+
+    @Test
+    void 게시물수정(){
+
+        //given
+        BlogPost blogPost = BlogPost.builder()
+                .id(1L)
+                .title("title1")
+                .content("content1")
+                .tags("tags")
+                .searchCount(1L)
+                .views(1L).build();
+
+        User user = User. builder()
+                .id(2L)
+                .email("email@email.com")
+                .nickName("nickname")
+                .profileUrl("profileimage")
+                .build();
+
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .id(1L)
+                .title("title2")
+                .content("content2")
+                .tags("tags2")
+                .searchCount(2L)
+                .views(2L).build();
+
+        blogPost.updateUser(user);
+
+        when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(blogPost));
+        when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
+
+        //when
+        BlogPostDto retBlogPostDto = blogPostService.updateBlogPost(blogPostDto);
+
+        //then
+        /**
+         * Id 변경이 일어나면 안됨, 내용물의 변경만 일어날 수 있도록 확인.
+         */
+        assertThat(retBlogPostDto.getId()).isEqualTo(blogPost.getId());
+        assertThat(retBlogPostDto.getTitle()).isEqualTo(blogPostDto.getTitle());
+        assertThat(retBlogPostDto.getTags()).isEqualTo(blogPostDto.getTags());
+        assertThat(retBlogPostDto.getSearchCount()).isEqualTo(blogPostDto.getSearchCount());
+        assertThat(retBlogPostDto.getViews()).isEqualTo(blogPostDto.getViews());
+    }
+
+    @Test
+    void 게시물수정_실패(){
+        //given
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .id(1L)
+                .title("title2")
+                .content("content2")
+                .tags("tags2")
+                .searchCount(2L)
+                .views(2L).build();
+
+        when(blogPostRepository.findById(any(Long.class))).thenThrow(NoSuchElementException.class);
+
+        //when
+        /**
+         * NoSuchElementException을 Throw 하는지 Test.
+         */
+        assertThrows(NoSuchElementException.class,()->blogPostService.updateBlogPost(blogPostDto));
+    }
+
+    @Test()
+    void 게시물삭제_삭제할_게시물_조회실패(){
+        //given
+        when(blogPostRepository.findById(any(Long.class))).thenThrow(NoSuchElementException.class);
+        //when
+        //then
+        assertThrows(NoSuchElementException.class,()->blogPostService.deleteBlogPost(1L));
+    }
+
 
 
 }

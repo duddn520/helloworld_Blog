@@ -1,6 +1,7 @@
 package com.helloworldweb.helloworld_guestbook.domain;
 
 import com.sun.istack.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,5 +38,20 @@ public class BlogPost {
 
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)
     private List<PostImage> postImages = new ArrayList<>();
+
+    @Builder
+    public BlogPost(Long id, String title, String content, String tags, Long searchCount, Long views){
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.tags = tags;
+        this.searchCount = searchCount;
+        this.views = views;
+    }
+
+    public void updateUser(User user){
+        this.user = user;
+        user.getBlogPosts().add(this);
+    }
 
 }

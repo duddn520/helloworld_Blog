@@ -1,6 +1,7 @@
 package com.helloworldweb.helloworld_guestbook.domain;
 
 import com.sun.istack.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,10 +22,20 @@ public class User {
     private String profileUrl;
     private String nickName;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<BlogPost> blogPosts = new ArrayList<>();
+
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private GuestBook guestBook;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<GuestBookComment> guestBookComments = new ArrayList<>();
 
+    @Builder
+    public User (Long id, String email, String profileUrl, String nickName){
+        this.id = id;
+        this.email = email;
+        this.profileUrl = profileUrl;
+        this.nickName = nickName;
+    }
 }

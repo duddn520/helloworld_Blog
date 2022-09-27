@@ -23,7 +23,6 @@ public class BlogPostServiceImpl implements BlogPostService{
     @Override
     @Transactional
     public BlogPostDto addBlogPost(BlogPostDto blogPostDto, String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
 
         BlogPost blogPost = BlogPost.builder()
                 .title(blogPostDto.getTitle())
@@ -31,7 +30,7 @@ public class BlogPostServiceImpl implements BlogPostService{
                 .searchCount(blogPostDto.getSearchCount())
                 .views(blogPostDto.getViews())
                 .build();
-
+        User user = getUserByEmail(email);
         blogPost.updateUser(user);
         return new BlogPostDto(blogPostRepository.save(blogPost));
 
@@ -55,8 +54,12 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     @Transactional
-    public BlogPostDto updateBlogPost(BlogPostDto blogPostDto) throws NoSuchElementException {
-        try {
+    public BlogPostDto updateBlogPost(BlogPostDto blogPostDto, String email){
+
+        if(!vaildateCaller(blogPostDto.getUserId(),email)){
+            throw new IllegalCallerException("게시글 작성자만 수정할 수 있습니다.");
+        }
+        else{
             BlogPost blogPost = getBlogPostById(blogPostDto.getId());
             blogPost.updateBlogPost(blogPostDto);
 
@@ -70,25 +73,35 @@ public class BlogPostServiceImpl implements BlogPostService{
                     .searchCount(savedBlogPost.getSearchCount())
                     .views(savedBlogPost.getViews())
                     .build();
-        }catch (NoSuchElementException e)
-        {
-            throw e;
         }
+
     }
 
     @Override
     @Transactional
-    public void deleteBlogPost(Long id) throws NoSuchElementException {
-        try{
+    public void deleteBlogPost(Long id, String email){
+        if(!vaildateCaller(getBlogPostById(id).getUser().getId(),email)){
+            throw new IllegalCallerException("게시글 작성자만 수정할 수 있습니다.");
+        }else{
             BlogPost blogPost = getBlogPostById(id);
             blogPostRepository.delete(blogPost);
-        }catch (NoSuchElementException e){
-            throw e;
         }
-
     }
 
     private BlogPost getBlogPostById(Long id){
         return blogPostRepository.findById(id).orElseThrow(()->new NoSuchElementException("해당 포스트가 없습니다."));
+    }
+
+    private User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+
+    }
+
+    private boolean vaildateCaller(Long userId, String callerEmail){
+        if (userId.equals(getUserByEmail(callerEmail).getId())){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

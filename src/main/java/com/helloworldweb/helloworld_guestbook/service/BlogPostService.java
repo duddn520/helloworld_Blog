@@ -33,14 +33,18 @@ public interface BlogPostService {
     /** U
      * updateBlogPost - BLOGPOST 정보를 받고, 기존 BLOGPOST객체를 UPDATE하는 함수.
      * @param blogPostDto - 변경할 BLOGPOST에 대한 정보를 담은 DTO
+     * @param email - update 요청한 유저의 email(JWT 혹은 쿠키에서 획득)
+     * 글 작성자와 요청자가 일치하지 않을경우 IllegalCallerException 발생.
      * @return - 변경 이후의 BLOGPOST 정보.
      */
-    BlogPostDto updateBlogPost(BlogPostDto blogPostDto);
+    BlogPostDto updateBlogPost(BlogPostDto blogPostDto, String email);
 
     /** D
      * deleteBlogPost - BLOGPOST의 ID를 통해 BLOGPOST객체 삭제.
-     * @param id - 삭제할 BLOGPOST 객체의 ID
+     * @param id - 삭제할 BLOGPOST 객체의 ID제
+     * @param email - 삭제 요청한사람의 email
+     * 글 작성자와 요청자가 일치하지 않을경우 IllegalCallerException 발생.
      */
-    void deleteBlogPost(Long id);
+    void deleteBlogPost(Long id, String email);
 
 }

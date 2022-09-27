@@ -123,6 +123,16 @@ public class BlogPostServiceTest {
                 .searchCount(1L)
                 .views(1L).build();
 
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .id(1L)
+                .title("title2")
+                .content("content2")
+                .tags("tags2")
+                .searchCount(3L)
+                .views(3L)
+                .userId(2L)
+                .build();
+
         User user = User. builder()
                 .id(2L)
                 .email("email@email.com")
@@ -131,11 +141,9 @@ public class BlogPostServiceTest {
                 .build();
 
         blogPost.updateUser(user);
-        BlogPostDto blogPostDto = new BlogPostDto(blogPost);
 
-
-        when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(blogPost));
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
+        when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(blogPost));
         when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when

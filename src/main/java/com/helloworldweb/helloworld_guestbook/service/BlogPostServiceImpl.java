@@ -24,12 +24,7 @@ public class BlogPostServiceImpl implements BlogPostService{
     @Transactional
     public BlogPostDto addBlogPost(BlogPostDto blogPostDto, String email) {
 
-        BlogPost blogPost = BlogPost.builder()
-                .title(blogPostDto.getTitle())
-                .content(blogPostDto.getContent())
-                .searchCount(blogPostDto.getSearchCount())
-                .views(blogPostDto.getViews())
-                .build();
+        BlogPost blogPost = blogPostDto.toEntity();
         User user = getUserByEmail(email);
         blogPost.updateUser(user);
         return new BlogPostDto(blogPostRepository.save(blogPost));
@@ -38,13 +33,8 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     public BlogPostDto getBlogPost(Long id) throws NoSuchElementException {
-        try{
-            BlogPost blogPost = getBlogPostById(id);
-            return new BlogPostDto(blogPost);
-        }catch(NoSuchElementException e)
-        {
-            throw e;
-        }
+        BlogPost blogPost = getBlogPostById(id);
+        return new BlogPostDto(blogPost);
     }
 
     @Override
@@ -62,17 +52,7 @@ public class BlogPostServiceImpl implements BlogPostService{
         else{
             BlogPost blogPost = getBlogPostById(blogPostDto.getId());
             blogPost.updateBlogPost(blogPostDto);
-
-            BlogPost savedBlogPost = blogPostRepository.save(blogPost);
-
-            return BlogPostDto.builder()
-                    .id(savedBlogPost.getId())
-                    .title(savedBlogPost.getTitle())
-                    .content(savedBlogPost.getContent())
-                    .tags(savedBlogPost.getTags())
-                    .searchCount(savedBlogPost.getSearchCount())
-                    .views(savedBlogPost.getViews())
-                    .build();
+            return new BlogPostDto(blogPostRepository.save(blogPost));
         }
 
     }

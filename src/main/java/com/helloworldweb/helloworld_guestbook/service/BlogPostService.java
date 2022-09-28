@@ -1,11 +1,9 @@
 package com.helloworldweb.helloworld_guestbook.service;
 
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface BlogPostService {
 
     /** C
@@ -18,7 +16,7 @@ public interface BlogPostService {
 
     /** R
      * getBlogPost - 웹서버에서 받아오는 BlogPost의 ID를 통하여 해당 BLOGPOST DTO를 반환하는 함수.
-     * @param id - User의 ID
+     * @param id - BlogPost의 ID
      * @return BLOGPOST 정보가 담긴 BLOGPOSTDTO
      */
     BlogPostDto getBlogPost(Long id);
@@ -41,10 +39,10 @@ public interface BlogPostService {
 
     /** D
      * deleteBlogPost - BLOGPOST의 ID를 통해 BLOGPOST객체 삭제.
-     * @param id - 삭제할 BLOGPOST 객체의 ID제
+     * @param blogPostId - 삭제할 BLOGPOST 객체의 ID제
      * @param email - 삭제 요청한사람의 email
      * 글 작성자와 요청자가 일치하지 않을경우 IllegalCallerException 발생.
      */
-    void deleteBlogPost(Long id, String email);
+    void deleteBlogPost(Long blogPostId, String email);
 
 }

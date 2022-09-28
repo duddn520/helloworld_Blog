@@ -32,10 +32,17 @@ public class User {
     private List<GuestBookComment> guestBookComments = new ArrayList<>();
 
     @Builder
-    public User (Long id, String email, String profileUrl, String nickName){
+    public User (Long id, String email, String profileUrl, String nickName, List<BlogPost>  blogPosts, GuestBook guestBook, List<GuestBookComment> guestBookComments){
         this.id = id;
         this.email = email;
         this.profileUrl = profileUrl;
         this.nickName = nickName;
+        this.blogPosts = blogPosts;
+        this.guestBook = guestBook;
+        this.guestBookComments = guestBookComments;
+    }
+
+    public void updateGuestBook(GuestBook guestBook){
+        this.guestBook = guestBook;
     }
 }

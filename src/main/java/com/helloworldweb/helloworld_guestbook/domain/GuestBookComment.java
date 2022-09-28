@@ -1,6 +1,8 @@
 package com.helloworldweb.helloworld_guestbook.domain;
 
+import com.helloworldweb.helloworld_guestbook.dto.GuestBookCommentDto;
 import com.sun.istack.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +18,9 @@ public class GuestBookComment {
 
     @NotNull
     private String content;
+
+    private String reply;
+
     // 작성한 유저
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -24,4 +29,30 @@ public class GuestBookComment {
     @ManyToOne
     @JoinColumn(name = "guest_book_id")
     private GuestBook guestBook;
+
+    @Builder
+    public GuestBookComment(Long id, String content, String reply, User user,GuestBook guestBook){
+        this.id = id;
+        this.content = content;
+        this.reply = reply;
+        this.user = user;
+        this.guestBook = guestBook;
+    }
+
+    public void updateGuestBook(GuestBook guestBook){
+        this.guestBook = guestBook;
+        guestBook.getGuestBookComments().add(this);
+    }
+
+    public void updateUser(User user){
+        this.user = user;
+        user.getGuestBookComments().add(this);
+    }
+
+    public GuestBookComment updateGuestBookComment(GuestBookCommentDto guestBookCommentDto){
+        this.content = guestBookCommentDto.getContent();
+        this.reply = guestBookCommentDto.getReply();
+
+        return this;
+    }
 }

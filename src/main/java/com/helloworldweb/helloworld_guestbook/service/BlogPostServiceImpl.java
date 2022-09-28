@@ -59,11 +59,11 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     @Transactional
-    public void deleteBlogPost(Long id, String email){
-        if(!vaildateCaller(getBlogPostById(id).getUser().getId(),email)){
+    public void deleteBlogPost(Long blogPostId, String email){
+        if(!vaildateCaller(getBlogPostById(blogPostId).getUser().getId(),email)){
             throw new IllegalCallerException("게시글 작성자만 수정할 수 있습니다.");
         }else{
-            BlogPost blogPost = getBlogPostById(id);
+            BlogPost blogPost = getBlogPostById(blogPostId);
             blogPostRepository.delete(blogPost);
         }
     }

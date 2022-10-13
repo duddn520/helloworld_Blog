@@ -25,7 +25,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<BlogPost> blogPosts = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "guest_book_id")
     private GuestBook guestBook;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -44,5 +45,6 @@ public class User {
 
     public void updateGuestBook(GuestBook guestBook){
         this.guestBook = guestBook;
+        guestBook.updateUser(this);
     }
 }

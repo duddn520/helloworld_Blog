@@ -17,8 +17,7 @@ public class GuestBook {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "guestBook", fetch = FetchType.LAZY)
     private User user;
 
     @OneToMany(mappedBy = "guestBook", cascade = CascadeType.ALL)
@@ -33,7 +32,6 @@ public class GuestBook {
 
     public void updateUser(User user){
         this.user = user;
-        user.updateGuestBook(this);
     }
 
 }

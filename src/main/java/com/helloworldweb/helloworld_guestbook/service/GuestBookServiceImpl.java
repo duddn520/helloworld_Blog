@@ -36,9 +36,10 @@ public class GuestBookServiceImpl implements GuestBookService{
     }
 
     @Override
+    // TODO: 2022/10/16 User를 통해 GuestBook 가져오는 부분 fetchJoin통해 한번 쿼리로 처리. 로직 변경 필요.
     public GuestBookDto getGuestBook(Long userId) {
-        User user = getUserById(userId);
-        return new GuestBookDto(user.getGuestBook());
+        GuestBookDto guestBookDto =  new GuestBookDto(getUserWithGuestBook(userId).getGuestBook());
+        return guestBookDto;
     }
 
     @Override
@@ -85,5 +86,11 @@ public class GuestBookServiceImpl implements GuestBookService{
         }else{
             return false;
         }
+    }
+
+    private User getUserWithGuestBook(Long userId){
+        User user = userRepository.findUserWithGuestBook(userId).orElseThrow
+                (()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        return user;
     }
 }

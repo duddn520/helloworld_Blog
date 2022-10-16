@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +41,16 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     public List<BlogPostDto> getAllBlogPosts(String email) {
-        return null;
+
+        User findUser = getUserByEmail(email);
+
+        List<BlogPost> blogPosts = blogPostRepository.findAllByUserId(findUser.getId()).orElseGet(()->new ArrayList<>());
+
+        List<BlogPostDto> blogPostDtos  = blogPosts.stream().map((b)->new BlogPostDto(b)).collect(Collectors.toList());
+
+        return blogPostDtos;
+
+
     }
 
     @Override

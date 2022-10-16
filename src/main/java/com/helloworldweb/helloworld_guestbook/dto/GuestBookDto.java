@@ -18,7 +18,7 @@ public class GuestBookDto {
     {
         this.id = guestBook.getId();
         this.userId = guestBook.getUser().getId();
-        this.guestBookCommentDtos = guestBookCommentToDtos(guestBook.getGuestBookComments());
+//        this.guestBookCommentDtos = guestBookCommentToDtos(guestBook.getGuestBookComments());
     }
 
     private List<GuestBookCommentDto> guestBookCommentToDtos(List<GuestBookComment> guestBookComments){

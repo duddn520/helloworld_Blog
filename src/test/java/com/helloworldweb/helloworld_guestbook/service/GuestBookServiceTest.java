@@ -55,13 +55,11 @@ public class GuestBookServiceTest {
             .id(1L)
             .email(testUser1Email)
             .guestBook(testGuestBook1)
-            .guestBookComments(new ArrayList<>())
             .build();
     private static final User testUser2 = User.builder()
             .id(2L)
             .email(testUser2Email)
             .guestBook(testGuestBook2)
-            .guestBookComments(new ArrayList<>())
             .build();
 
     private static final GuestBookCommentDto testGuestBookComment1Dto = GuestBookCommentDto.builder()

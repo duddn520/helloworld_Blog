@@ -10,10 +10,10 @@ public interface GuestBookService {
      * GuestBook에 GuestBookComment를 등록하는 함수.
      * @param userId - GuestBookComent를 등록하려는 GuestBook의 주인 ID
      * @param guestBookCommentDto - 등록하려는 GuestBookComment의 정보가 담긴 Dto 객체.
-     * @param email - 방명록을 작성한 유저의 Email.
+     * @param writerEmail - 방명록을 작성한 유저의 Email.
      * @return GuestBook 객체를 Dto화 하여 리턴.
      */
-    GuestBookDto addGuestBookComment(Long userId, GuestBookCommentDto guestBookCommentDto, String email);
+    GuestBookDto addGuestBookComment(Long userId, GuestBookCommentDto guestBookCommentDto, String writerEmail);
 
     /** R
      * GuestBook 객체를 조회하는 함수. GuestBook의 ID를 통해 조회한다.

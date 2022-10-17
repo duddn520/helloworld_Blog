@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class GuestBookDto {
@@ -18,17 +19,8 @@ public class GuestBookDto {
     {
         this.id = guestBook.getId();
         this.userId = guestBook.getUser().getId();
-//        this.guestBookCommentDtos = guestBookCommentToDtos(guestBook.getGuestBookComments());
-    }
-
-    private List<GuestBookCommentDto> guestBookCommentToDtos(List<GuestBookComment> guestBookComments){
-        List<GuestBookCommentDto> guestBookCommentDtos = new ArrayList<>();
-
-        for(GuestBookComment g : guestBookComments){
-            guestBookCommentDtos.add(new GuestBookCommentDto(g));
-        }
-
-        return guestBookCommentDtos;
+        this.guestBookCommentDtos = guestBook.getGuestBookComments() == null ? new ArrayList<>() :
+                guestBook.getGuestBookComments().stream().map((g)->new GuestBookCommentDto(g)).collect(Collectors.toList());
     }
 
 }

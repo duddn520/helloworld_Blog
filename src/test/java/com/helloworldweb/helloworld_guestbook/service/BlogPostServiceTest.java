@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -271,6 +273,126 @@ public class BlogPostServiceTest {
          * 게시글 작성자와 호출자가 다른경우, IllegalCallerException 발생 Test
          */
         assertThrows(IllegalCallerException.class,()->blogPostService.deleteBlogPost(blogPostDto.getId(),callerEmail));
+
+    }
+
+    @Test
+    void 게시물전체조회_성공(){
+
+        //given
+        User user = User. builder()
+                .id(1L)
+                .email("email@email.com")
+                .nickName("nickname")
+                .profileUrl("profileimage")
+                .build();
+
+        BlogPost blogPost1 = BlogPost.builder()
+                .id(2L)
+                .title("title1")
+                .content("content")
+                .tags("tags")
+                .views(2L)
+                .searchCount(2L).build();
+        BlogPost blogPost2 = BlogPost.builder()
+                .id(3L)
+                .title("title2")
+                .content("content")
+                .tags("tags")
+                .views(2L)
+                .searchCount(2L).build();
+        BlogPost blogPost3 = BlogPost.builder()
+                .id(4L)
+                .title("title3")
+                .content("content")
+                .tags("tags")
+                .views(2L)
+                .searchCount(2L).build();
+
+        blogPost1.updateUser(user);
+        blogPost2.updateUser(user);
+        blogPost3.updateUser(user);
+        List<BlogPost> blogPosts = new ArrayList<>();
+        blogPosts.add(blogPost1);
+        blogPosts.add(blogPost2);
+        blogPosts.add(blogPost3);
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
+        when(blogPostRepository.findAllByUserId(any(Long.class))).thenReturn(Optional.of(blogPosts));
+
+        //when
+        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts("email@email.com");
+
+        //then
+        /**
+         * size, 제목, id 확인
+         */
+        assertThat(blogPostDtos.size()).isEqualTo(3);
+        assertThat(blogPostDtos.get(0).getTitle()).isEqualTo("title1");
+        assertThat(blogPostDtos.get(1).getId()).isEqualTo(3L);
+
+    }
+
+    @Test
+    void 게시물전체조회_존재하지않는UserEmail(){
+        //given
+        User user = User. builder()
+                .id(1L)
+                .email("email@email.com")
+                .nickName("nickname")
+                .profileUrl("profileimage")
+                .build();
+
+        BlogPost blogPost1 = BlogPost.builder()
+                .id(2L)
+                .title("title1")
+                .content("content")
+                .tags("tags")
+                .views(2L)
+                .searchCount(2L).build();
+        BlogPost blogPost2 = BlogPost.builder()
+                .id(3L)
+                .title("title2")
+                .content("content")
+                .tags("tags")
+                .views(2L)
+                .searchCount(2L).build();
+        BlogPost blogPost3 = BlogPost.builder()
+                .id(4L)
+                .title("title3")
+                .content("content")
+                .tags("tags")
+                .views(2L)
+                .searchCount(2L).build();
+
+        blogPost1.updateUser(user);
+        blogPost2.updateUser(user);
+        blogPost3.updateUser(user);
+
+        //when
+        //
+        when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException());
+
+        //then
+        assertThrows(NoSuchElementException.class,()->blogPostService.getAllBlogPosts(""));
+
+    }
+
+    @Test
+    void 게시물전체조회_게시물존재하지않으면_빈리스트(){
+        //given
+        User user = User. builder()
+                .id(1L)
+                .email("email@email.com")
+                .nickName("nickname")
+                .profileUrl("profileimage")
+                .build();
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
+        when(blogPostRepository.findAllByUserId(any(Long.class))).thenReturn(Optional.of(new ArrayList<>()));
+        //when
+        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts("email@email.com");
+
+        //then
+        assertThat(blogPostDtos.size()).isEqualTo(0);
 
     }
 

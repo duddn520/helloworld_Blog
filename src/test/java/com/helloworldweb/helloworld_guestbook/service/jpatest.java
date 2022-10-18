@@ -6,24 +6,17 @@ import com.helloworldweb.helloworld_guestbook.domain.GuestBookComment;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.helloworldweb.helloworld_guestbook.dto.GuestBookCommentDto;
+import com.helloworldweb.helloworld_guestbook.dto.GuestBookDto;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
-import com.helloworldweb.helloworld_guestbook.repository.BlogPostRepository;
 import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
-import org.apache.catalina.core.ApplicationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -68,6 +61,10 @@ public class jpatest {
                 .searchCount(2L).build();
 
         blogPostService.addBlogPost(blogPostdto,"email@email.com");
+        GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
+                        .content("contnent123123123")
+                        .build();
+        guestBookService.addGuestBookComment(1L,guestBookCommentDto,"123@email.com");
     }
 
     @Test
@@ -100,9 +97,12 @@ public class jpatest {
     @Test
     void GuestBook조회시_쿼리확인(){
         System.out.println("######################################################");
-        guestBookService.getGuestBook(1L);
-
-
+        GuestBookDto guestBookDto = guestBookService.getGuestBook(1L);
+        assertThat(guestBookDto.getGuestBookCommentDtos()).isInstanceOf(ArrayList.class);
+        assertThat(guestBookDto.getGuestBookCommentDtos().isEmpty()).isEqualTo(false);
+        assertThat(guestBookDto.getGuestBookCommentDtos().size()).isEqualTo(1);
+        assertThat(guestBookDto.getGuestBookCommentDtos().get(0).getUserId()).isEqualTo(3L);
+        assertThat(guestBookDto.getGuestBookCommentDtos().get(0).getContent()).isEqualTo("contnent123123123");
     }
 
 //

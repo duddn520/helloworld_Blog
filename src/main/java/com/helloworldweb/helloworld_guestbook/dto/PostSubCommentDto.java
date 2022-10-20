@@ -1,5 +1,6 @@
 package com.helloworldweb.helloworld_guestbook.dto;
 
+import com.helloworldweb.helloworld_guestbook.domain.PostComment;
 import com.helloworldweb.helloworld_guestbook.domain.PostSubComment;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,4 +24,9 @@ public class PostSubCommentDto {
         this.content = content;
     }
 
+    public PostSubComment toEntity(){
+        return PostSubComment.builder()
+                .content(this.content)
+                .build();
+    }
 }

@@ -32,8 +32,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<GuestBookComment> guestBookComments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PostSubComment> postSubComments = new ArrayList<>();
+
     @Builder
-    public User (Long id, String email, String profileUrl, String nickName,List<BlogPost> blogPosts, GuestBook guestBook, List<GuestBookComment> guestBookComments){
+    public User (Long id, String email, String profileUrl, String nickName,List<BlogPost> blogPosts, GuestBook guestBook, List<GuestBookComment> guestBookComments, List<PostSubComment> postSubComments){
         this.id = id;
         this.email = email;
         this.profileUrl = profileUrl;
@@ -41,6 +44,7 @@ public class User {
         this.blogPosts = blogPosts == null ? new ArrayList<>() : blogPosts;
         this.guestBook = guestBook;
         this.guestBookComments = guestBookComments == null ? new ArrayList<>() : guestBookComments;
+        this.postSubComments = postSubComments == null ? new ArrayList<>() : postSubComments;
     }
 
     public void updateGuestBook(GuestBook guestBook){

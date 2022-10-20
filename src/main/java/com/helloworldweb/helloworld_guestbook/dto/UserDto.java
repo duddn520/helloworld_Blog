@@ -22,6 +22,7 @@ public class UserDto {
 
     public User toEntity(){
         return User.builder()
+                .id(this.id)
                 .email(this.email)
                 .nickName(this.nickName)
                 .profileUrl(this.profileUrl)

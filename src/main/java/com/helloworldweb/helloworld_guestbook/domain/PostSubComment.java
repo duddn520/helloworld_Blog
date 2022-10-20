@@ -1,6 +1,7 @@
 package com.helloworldweb.helloworld_guestbook.domain;
 
 import com.sun.istack.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,5 +25,22 @@ public class PostSubComment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Builder
+    public PostSubComment(Long id, String content, PostComment postComment, User user){
+        this.id = id;
+        this.content = content;
+        this.postComment = postComment;
+        this.user = user;
+    }
+
+    public void updateUser(User user){
+        this.user = user;
+        user.getPostSubComments().add(this);
+    }
+    public void updatePostComment(PostComment postComment){
+        this.postComment = postComment;
+        postComment.getPostSubComments().add(this);
+    }
 
 }

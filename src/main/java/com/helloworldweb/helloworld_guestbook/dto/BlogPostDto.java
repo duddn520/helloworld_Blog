@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @NoArgsConstructor
 @Getter
 public class BlogPostDto {
@@ -15,6 +19,7 @@ public class BlogPostDto {
     private String tags;
     private Long searchCount ;
     private Long views;
+    private List<PostCommentDto> postCommentDtos = new ArrayList<>();
 
     public BlogPostDto(BlogPost blogPost){
         this.id = blogPost.getId();
@@ -24,6 +29,7 @@ public class BlogPostDto {
         this.tags = blogPost.getTags();
         this.searchCount = blogPost.getSearchCount();
         this.views = blogPost.getViews();
+        this.postCommentDtos = blogPost.getPostComments() == null? new ArrayList<>() : blogPost.getPostComments().stream().map((p) -> new PostCommentDto(p)).collect(Collectors.toList());
     }
 
     @Builder

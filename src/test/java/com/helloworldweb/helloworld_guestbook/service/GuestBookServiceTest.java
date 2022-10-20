@@ -29,7 +29,6 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-@Transactional
 public class GuestBookServiceTest {
 
     @Mock
@@ -100,7 +99,6 @@ public class GuestBookServiceTest {
 
         //내용물 확인 ( 2번 유저의 작성 게시물의 content와, 1번 유저 방명록에 적힌 content 비교)
         assertEquals(testUser1.getGuestBook().getGuestBookComments().get(0).getContent(),testUser2.getGuestBookComments().get(0).getContent());
-
     }
 
     @Test

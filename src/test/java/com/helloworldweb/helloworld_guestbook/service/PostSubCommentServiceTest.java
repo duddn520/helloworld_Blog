@@ -77,12 +77,6 @@ public class PostSubCommentServiceTest {
             .blogPost(testBlogPost1)
             .build();
 
-
-    @BeforeEach
-    void 연관주입(){
-
-    }
-
     @Test
     void 댓글생성_성공(){
         //given

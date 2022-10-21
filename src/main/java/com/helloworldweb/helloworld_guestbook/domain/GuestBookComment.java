@@ -22,11 +22,11 @@ public class GuestBookComment {
     private String reply;
 
     // 작성한 유저
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "guest_book_id")
     private GuestBook guestBook;
 

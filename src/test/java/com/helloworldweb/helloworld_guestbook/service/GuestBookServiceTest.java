@@ -2,20 +2,15 @@ package com.helloworldweb.helloworld_guestbook.service;
 
 import com.helloworldweb.helloworld_guestbook.domain.GuestBook;
 import com.helloworldweb.helloworld_guestbook.domain.GuestBookComment;
-import com.helloworldweb.helloworld_guestbook.domain.PostComment;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.GuestBookCommentDto;
 import com.helloworldweb.helloworld_guestbook.repository.GuestBookCommentRepository;
 import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -137,8 +132,7 @@ public class GuestBookServiceTest {
         existGuestBookComment.updateGuestBook(testGuestBook1);
         testUser2.getGuestBookComments().add(existGuestBookComment);
 
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser2));
-        when(guestBookCommentRepository.findById(any(Long.class))).thenReturn(Optional.of(existGuestBookComment));
+        when(guestBookCommentRepository.findGuestBookCommentWithUserById(any(Long.class))).thenReturn(Optional.of(existGuestBookComment));
         //when
         GuestBookCommentDto guestBookCommentDto = guestBookService.updateGuestBookComment(testGuestBookComment1Dto,testUser2Email);
 
@@ -156,8 +150,6 @@ public class GuestBookServiceTest {
     void 방명록수정_잘못된_수정자Email(){
 
         //given
-        when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-
         //when
         //then
         assertThrows(NoSuchElementException.class,()->guestBookService.updateGuestBookComment(testGuestBookComment1Dto,testUser2Email));
@@ -168,8 +160,7 @@ public class GuestBookServiceTest {
     void 방명록수정_잘못된_GuestBookCommentID(){
 
         //given
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser2));
-        when(guestBookCommentRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 방명록이 존재하지 않습니다."));
+        when(guestBookCommentRepository.findGuestBookCommentWithUserById(any(Long.class))).thenThrow(new NoSuchElementException("해당 방명록이 존재하지 않습니다."));
 
         //when
         //then
@@ -189,18 +180,16 @@ public class GuestBookServiceTest {
                 .build();
         existGuestBookComment.updateGuestBook(testGuestBook1);
         testUser2.getGuestBookComments().add(existGuestBookComment);
-
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser1));
         //when (testUser2가 작성한 방명록을 testUser1이 수정 시도.)
         //then
-        assertThrows(IllegalCallerException.class,()->guestBookService.updateGuestBookComment(testGuestBookComment1Dto,testUser1Email));
+        assertThrows(NoSuchElementException.class,()->guestBookService.updateGuestBookComment(testGuestBookComment1Dto,testUser1Email));
 
     }
 
     @Test
     void 방명록삭제_잘못된_방명록ID(){
         //given
-        when(guestBookCommentRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 방명록이 존재하지 않습니다."));
+        when(guestBookCommentRepository.findGuestBookCommentWithUserById(any(Long.class))).thenThrow(new NoSuchElementException("해당 방명록이 존재하지 않습니다."));
         //when
         //then
         assertThrows(NoSuchElementException.class,()->guestBookService.deleteGuestBookComment(5L,testUser1Email));
@@ -219,18 +208,18 @@ public class GuestBookServiceTest {
                 .build();
         existGuestBookComment.updateGuestBook(testGuestBook1);
         testUser2.getGuestBookComments().add(existGuestBookComment);
-        when(guestBookCommentRepository.findById(any(Long.class))).thenReturn(Optional.of(existGuestBookComment));
-        when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        when(guestBookCommentRepository.findGuestBookCommentWithUserById(any(Long.class))).thenReturn(Optional.of(existGuestBookComment));
 
         //when
         //then
-        assertThrows(NoSuchElementException.class,()->guestBookService.deleteGuestBookComment(5L,testUser2Email));
+        assertThrows(IllegalCallerException.class,()->guestBookService.deleteGuestBookComment(5L,testUser1Email));
 
     }
     @Test
     void 방명록삭제_작성자_요청자비일치(){
 
         //given
+        //testuser1의 방명록, 거기에 글 쓴 testuser2
         testGuestBook1.updateUser(testUser1);
         GuestBookComment existGuestBookComment = GuestBookComment.builder()
                 .id(5L)
@@ -241,9 +230,7 @@ public class GuestBookServiceTest {
         existGuestBookComment.updateGuestBook(testGuestBook1);
         testUser2.getGuestBookComments().add(existGuestBookComment);
 
-        when(guestBookCommentRepository.findById(any(Long.class))).thenReturn(Optional.of(existGuestBookComment));
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser1));
-
+        when(guestBookCommentRepository.findGuestBookCommentWithUserById(any(Long.class))).thenReturn(Optional.of(existGuestBookComment));
         //when
         //then
         assertThrows(IllegalCallerException.class,()->guestBookService.deleteGuestBookComment(5L,testUser1Email));

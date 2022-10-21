@@ -30,6 +30,7 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
 
     @Override
     @Transactional
+    //첫번째 댓글 작성.(존재하지 않는 PostComment)
     public PostSubCommentDto createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto, String writerEmail) {
         BlogPost blogPost = getBlogPostById(postId);
         PostComment postComment = PostComment.builder().build();
@@ -51,6 +52,7 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
 
     @Override
     @Transactional
+    //존재하는 PostComment에 PostSubComment 추가.
     public PostSubCommentDto addPostSubComment(Long postCommentId, PostSubCommentDto postSubCommentDto, String writerEmail) {
         PostComment postComment = getPostCommentById(postCommentId);
         User writer = getUserByEmail(writerEmail);
@@ -66,20 +68,20 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
 
     @Override
     public PostSubCommentDto getPostSubComment(Long postSubCommentId) {
-        PostSubComment postSubComment = getPostSubCommentById(postSubCommentId);
+        PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentId);
         return new PostSubCommentDto(postSubComment);
     }
 
     @Override
+    @Transactional
     public List<PostSubCommentDto> getAllMySubComments(Long userId) {
         List<PostSubCommentDto> postSubCommentDtos = postSubCommentRepository.findAllByUserId(userId).orElseGet(()->new ArrayList<>()).stream().map((psc) -> new PostSubCommentDto(psc)).collect(Collectors.toList());
         return postSubCommentDtos;
     }
 
     @Override
-    @Transactional
     public PostSubCommentDto updatePostSubComment(PostSubCommentDto postSubCommentDto, String modifierEmail) {
-        PostSubComment postSubComment = getPostSubCommentById(postSubCommentDto.getId());
+        PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentDto.getId());
         if (validateCaller(postSubComment.getUser().getEmail(),modifierEmail)) {
             return new PostSubCommentDto(postSubComment.updatePostSubComment(postSubCommentDto));
         }else{
@@ -89,7 +91,7 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
 
     @Override
     public void deletePostSubComment(Long postSubCommentId, String callerEmail) {
-        PostSubComment postSubComment = getPostSubCommentById(postSubCommentId);
+        PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentId);
         String commentEmail = postSubComment.getUser().getEmail();
         if(validateCaller(commentEmail,callerEmail)){
             postSubCommentRepository.delete(postSubComment);
@@ -114,6 +116,10 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     private PostSubComment getPostSubCommentById(Long postSubCommentId){
         return postSubCommentRepository.findById(postSubCommentId).orElseThrow(()-> new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
         
+    }
+
+    private PostSubComment getPostSubCommentWithUserById(Long postSubCommentId){
+        return postSubCommentRepository.findPostSubCommentWithUserById(postSubCommentId).orElseThrow(()-> new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
     }
 
     private boolean validateCaller(String email, String callerEmail){

@@ -10,7 +10,4 @@ import java.util.Optional;
 
 public interface BlogPostRepository extends JpaRepository<BlogPost,Long> {
     Optional<List<BlogPost>> findAllByUserId (Long userId);
-
-    @Query(value = "select distinct b from BlogPost b left join fetch b.postComments pc left join fetch pc.postSubComments pcs left join fetch pcs.user where b.id = :blogPostId")
-    Optional<BlogPost> findBlogPostWithPostCommentsByBlogPostId(@Param(value = "blogPostId") Long blgPostId);
 }

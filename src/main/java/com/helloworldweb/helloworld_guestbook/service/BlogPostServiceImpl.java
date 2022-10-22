@@ -33,13 +33,17 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     }
 
+    // FetchJoin 시 post - fetch - postcomment , 이후 지연로딩 (batchSize조절)
     @Override
-    public BlogPostDto getBlogPost(Long id) throws NoSuchElementException {
+    @Transactional
+    //댓글, 대댓글, 대댓글을 단 user 모두 표시해야하기 때문에 지연로딩 필요.
+    public BlogPostDto getBlogPost(Long id){
         BlogPost blogPost = getBlogPostById(id);
         return new BlogPostDto(blogPost);
     }
 
     @Override
+    //댓글이나 대댓글을 표시할 필요 없어 지연로딩 관련 서비스 불필요.
     public List<BlogPostDto> getAllBlogPosts(String email) {
 
         User findUser = getUserByEmail(email);

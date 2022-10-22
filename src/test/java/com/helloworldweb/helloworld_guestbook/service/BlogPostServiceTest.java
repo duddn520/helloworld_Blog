@@ -114,7 +114,7 @@ public class BlogPostServiceTest {
     }
 
     @Test
-    void 게시물수정(){
+    void 게시물수정_성공(){
 
         //given
         BlogPost blogPost = BlogPost.builder()
@@ -144,8 +144,7 @@ public class BlogPostServiceTest {
 
         blogPost.updateUser(user);
 
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
-        when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(blogPost));
+        when(blogPostRepository.findBlogPostWithUserById(any(Long.class))).thenReturn(Optional.of(blogPost));
         when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when
@@ -193,14 +192,6 @@ public class BlogPostServiceTest {
                 .profileUrl("profileimage")
                 .build();
 
-        User caller = User. builder()
-                .id(1L)
-                .email("123@email.com")
-                .nickName("nickname")
-                .profileUrl("profileimage")
-                .build();
-
-
         String callerEmail = "123@email.com";
 
         BlogPostDto blogPostDto = BlogPostDto.builder()
@@ -212,7 +203,10 @@ public class BlogPostServiceTest {
                 .searchCount(2L)
                 .views(2L).build();
 
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(caller));
+        BlogPost blogPost = blogPostDto.toEntity();
+        blogPost.updateUser(user);
+
+        when(blogPostRepository.findBlogPostWithUserById(any(Long.class))).thenReturn(Optional.of(blogPost));
         //when
         //then
         /**
@@ -229,7 +223,7 @@ public class BlogPostServiceTest {
 
         String email = "1123@email.com";
         //given
-        when(blogPostRepository.findById(any(Long.class))).thenThrow(NoSuchElementException.class);
+        when(blogPostRepository.findBlogPostWithUserById(any(Long.class))).thenThrow(NoSuchElementException.class);
         //when
         //then
         assertThrows(NoSuchElementException.class,()->blogPostService.deleteBlogPost(1L, email));
@@ -265,8 +259,7 @@ public class BlogPostServiceTest {
 
         blogPost.updateUser(user);
         BlogPostDto blogPostDto = new BlogPostDto(blogPost);
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(caller));
-        when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(blogPost));
+        when(blogPostRepository.findBlogPostWithUserById(any(Long.class))).thenReturn(Optional.of(blogPost));
         //when
         //then
         /**
@@ -316,8 +309,7 @@ public class BlogPostServiceTest {
         blogPosts.add(blogPost1);
         blogPosts.add(blogPost2);
         blogPosts.add(blogPost3);
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
-        when(blogPostRepository.findAllByUserId(any(Long.class))).thenReturn(Optional.of(blogPosts));
+        when(blogPostRepository.findAllBlogPostByEmail(any(String.class))).thenReturn(Optional.of(blogPosts));
 
         //when
         List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts("email@email.com");
@@ -370,7 +362,7 @@ public class BlogPostServiceTest {
 
         //when
         //
-        when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException());
+        when(blogPostRepository.findAllBlogPostByEmail(any(String.class))).thenThrow(new NoSuchElementException());
 
         //then
         assertThrows(NoSuchElementException.class,()->blogPostService.getAllBlogPosts(""));
@@ -386,8 +378,7 @@ public class BlogPostServiceTest {
                 .nickName("nickname")
                 .profileUrl("profileimage")
                 .build();
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
-        when(blogPostRepository.findAllByUserId(any(Long.class))).thenReturn(Optional.of(new ArrayList<>()));
+        when(blogPostRepository.findAllBlogPostByEmail(any(String.class))).thenReturn(Optional.of(new ArrayList<>()));
         //when
         List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts("email@email.com");
 

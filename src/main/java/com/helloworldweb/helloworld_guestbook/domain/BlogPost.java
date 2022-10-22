@@ -30,7 +30,7 @@ public class BlogPost {
     // 조회수
     private Long views = 0L;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

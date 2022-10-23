@@ -12,5 +12,9 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByEmail(String email);
 
     @Query(value = "select distinct u from User u left join fetch u.guestBook g left join fetch g.guestBookComments gc left join fetch gc.user where u.id = :userId")
-    Optional<User> findUserWithGuestBookWithGuestBookComments(@Param(value = "userId") Long userId);
+    Optional<User> findUserWithGuestBookWithGuestBookCommentsbyId(@Param(value = "userId") Long userId);
+
+    @Query(value = "select u from User u join fetch u.guestBook g where u.id = :userId")
+    Optional<User> findUserWithGuestBookById(@Param(value = "userId")Long userId);
+
 }

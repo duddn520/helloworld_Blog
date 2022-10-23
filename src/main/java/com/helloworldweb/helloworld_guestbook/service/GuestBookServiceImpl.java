@@ -24,7 +24,7 @@ public class GuestBookServiceImpl implements GuestBookService{
     @Override
     @Transactional
     public GuestBookDto addGuestBookComment(Long userId, GuestBookCommentDto guestBookCommentDto, String email) {
-        User owner = getUserById(userId);
+        User owner = getUserWithGuestBookById(userId);
         User writer = getUserByEmail(email);
         GuestBook guestBook = owner.getGuestBook();
         GuestBookComment guestBookComment = guestBookCommentDto.toEntity();
@@ -40,7 +40,7 @@ public class GuestBookServiceImpl implements GuestBookService{
 
     @Override
     public GuestBookDto getGuestBook(Long userId) {
-        GuestBookDto guestBookDto =  new GuestBookDto(getUserWithGuestBook(userId).getGuestBook());
+        GuestBookDto guestBookDto =  new GuestBookDto(getUserWithGuestBookWithGueestBookCommentById(userId).getGuestBook());
         return guestBookDto;
     }
 
@@ -65,11 +65,6 @@ public class GuestBookServiceImpl implements GuestBookService{
         }
     }
 
-    private User getUserById(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-        return user;
-    }
-
     private User getUserByEmail(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         return user;
@@ -92,9 +87,14 @@ public class GuestBookServiceImpl implements GuestBookService{
         }
     }
 
-    private User getUserWithGuestBook(Long userId){
-        User user = userRepository.findUserWithGuestBookWithGuestBookComments(userId).orElseThrow
+    private User getUserWithGuestBookWithGueestBookCommentById(Long userId){
+        User user = userRepository.findUserWithGuestBookWithGuestBookCommentsbyId(userId).orElseThrow
                 (()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        return user;
+    }
+
+    private User getUserWithGuestBookById(Long userId){
+        User user = userRepository.findUserWithGuestBookById(userId).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         return user;
     }
 }

@@ -78,7 +78,7 @@ public class GuestBookServiceTest {
         //user 등록 시 GuestBook은 매핑되어있다고 가정.
         testGuestBook1.updateUser(testUser1);
         testGuestBook2.updateUser(testUser2);
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(testUser1));
+        when(userRepository.findUserWithGuestBookById(any(Long.class))).thenReturn(Optional.of(testUser1));
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser2));
 
         //when
@@ -99,7 +99,7 @@ public class GuestBookServiceTest {
     @Test
     void 방명록작성_잘못된_방명록주인ID(){
         //given
-        when(userRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        when(userRepository.findUserWithGuestBookById(any(Long.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
 
         //when
         //then
@@ -109,7 +109,7 @@ public class GuestBookServiceTest {
     @Test
     void 방명록작성_잘못된_방명록작성자ID(){
         //given
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(testUser1));
+        when(userRepository.findUserWithGuestBookById(any(Long.class))).thenReturn(Optional.of(testUser1));
         when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
 
         //when

@@ -44,7 +44,6 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     //댓글이나 대댓글, 작성자를 표시할 필요 없어 지연로딩 관련 서비스 불필요.
-    // TODO: 2022/10/22 fetchJoin을 통해 구현하자.
     public List<BlogPostDto> getAllBlogPosts(String email) {
 
         List<BlogPost> blogPosts = getAllBlogPostsByEmail(email);

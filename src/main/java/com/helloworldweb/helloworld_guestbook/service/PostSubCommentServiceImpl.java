@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-// TODO: 2022/10/18 구현체 작성, 테스트코드 작성.
 @RequiredArgsConstructor
 @Service
 public class PostSubCommentServiceImpl implements PostSubCommentService{

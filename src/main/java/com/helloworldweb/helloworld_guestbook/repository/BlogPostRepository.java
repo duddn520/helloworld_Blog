@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface BlogPostRepository extends JpaRepository<BlogPost,Long> {
     Optional<List<BlogPost>> findAllByUserId (Long userId);
 
-    @Query(value = "select b from BlogPost b join fetch b.user where b.id = :id")
+    @Query(value = "select b from BlogPost b join fetch b.user where b.id = :blogPostId")
     Optional<BlogPost> findBlogPostWithUserById(@Param(value = "blogPostId") Long blogPostId);
 
     @Query(value = "select b from BlogPost b join fetch b.user u where u.email = :email")

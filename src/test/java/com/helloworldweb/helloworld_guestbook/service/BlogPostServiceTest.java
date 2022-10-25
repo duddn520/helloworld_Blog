@@ -4,13 +4,16 @@ import com.helloworldweb.helloworld_guestbook.domain.BlogPost;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.helloworldweb.helloworld_guestbook.repository.BlogPostRepository;
-import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +31,26 @@ public class BlogPostServiceTest {
     @Mock
     BlogPostRepository blogPostRepository;
 
-    @Mock
-    UserRepository userRepository;
-
     @InjectMocks
     BlogPostServiceImpl blogPostService;
+
+    @BeforeEach
+    void contextHolder등록(){
+        User user = User. builder()
+                .id(2L)
+                .email("email@email.com")
+                .nickName("nickname")
+                .profileUrl("profileimage")
+                .build();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(user,"",user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
 
     @Test
     void 게시물작성(){
 
         //given
-        String email = "email@email.com";
         BlogPost blogPost = BlogPost.builder()
                 .content("content")
                 .title("title")
@@ -62,11 +74,9 @@ public class BlogPostServiceTest {
                 .build();
 
         when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
-        //Optional 객체를 반환하므로, Optional.of 사용하여 타입 지정.
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
 
         //when
-        BlogPostDto retBlogPostDto = blogPostService.addBlogPost(blogPostDto, email);
+        BlogPostDto retBlogPostDto = blogPostService.addBlogPost(blogPostDto);
 
         //then
         /**
@@ -83,35 +93,6 @@ public class BlogPostServiceTest {
         assertThat(retBlogPostDto.getUserId()).isEqualTo(user.getId());
     }
 
-    @Test
-    void 게시물등록_유저조회실패(){
-        //given
-        String email = "email@email.com";
-        BlogPost blogPost = BlogPost.builder()
-                .content("content")
-                .title("title")
-                .tags("tags")
-                .searchCount(1L)
-                .views(1L)
-                .build();
-
-        BlogPostDto blogPostDto = BlogPostDto.builder()
-                .title(blogPost.getTitle())
-                .content(blogPost.getContent())
-                .tags(blogPost.getTags())
-                .searchCount(blogPost.getSearchCount())
-                .views(blogPost.getViews()).build();
-
-        //유저조회시 실패 가정
-        when(userRepository.findByEmail(any(String.class))).thenThrow(NoSuchElementException.class);
-        //when
-        //then
-        /**
-         * 유저 조회 실패시 NoSuchElementException Throw 하는지 Test
-         */
-        assertThrows(NoSuchElementException.class,()->blogPostService.addBlogPost(blogPostDto,email));
-
-    }
 
     @Test
     void 게시물수정_성공(){
@@ -148,7 +129,7 @@ public class BlogPostServiceTest {
         when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when
-        BlogPostDto retBlogPostDto = blogPostService.updateBlogPost(blogPostDto,user.getEmail());
+        BlogPostDto retBlogPostDto = blogPostService.updateBlogPost(blogPostDto);
 
         //then
         /**
@@ -163,8 +144,6 @@ public class BlogPostServiceTest {
 
     @Test
     void 게시물수정_수정할_게시물_조회실패(){
-
-        String email = "123@email.com";
         //given
         BlogPostDto blogPostDto = BlogPostDto.builder()
                 .id(1L)
@@ -178,7 +157,7 @@ public class BlogPostServiceTest {
         /**
          * NoSuchElementException을 Throw 하는지 Test.
          */
-        assertThrows(NoSuchElementException.class,()->blogPostService.updateBlogPost(blogPostDto,email));
+        assertThrows(NoSuchElementException.class,()->blogPostService.updateBlogPost(blogPostDto));
     }
 
     @Test
@@ -186,13 +165,11 @@ public class BlogPostServiceTest {
 
         //given
         User user = User. builder()
-                .id(2L)
-                .email("email@email.com")
+                .id(3L)
+                .email("123@email.com")
                 .nickName("nickname")
                 .profileUrl("profileimage")
                 .build();
-
-        String callerEmail = "123@email.com";
 
         BlogPostDto blogPostDto = BlogPostDto.builder()
                 .id(1L)
@@ -212,7 +189,7 @@ public class BlogPostServiceTest {
         /**
          * 게시글 작성자와 호출자가 다른경우, IllegalCallerException 발생 Test
          */
-        assertThrows(IllegalCallerException.class,()->blogPostService.updateBlogPost(blogPostDto,callerEmail));
+        assertThrows(IllegalCallerException.class,()->blogPostService.updateBlogPost(blogPostDto));
 
 
 
@@ -221,33 +198,22 @@ public class BlogPostServiceTest {
     @Test
     void 게시물삭제_삭제할_게시물_조회실패(){
 
-        String email = "1123@email.com";
         //given
         when(blogPostRepository.findBlogPostWithUserById(any(Long.class))).thenThrow(NoSuchElementException.class);
         //when
         //then
-        assertThrows(NoSuchElementException.class,()->blogPostService.deleteBlogPost(1L, email));
+        assertThrows(NoSuchElementException.class,()->blogPostService.deleteBlogPost(1L));
     }
 
     @Test
     void 게시물삭제_게시물작성자_요청자_비일치(){
         //given
         User user = User. builder()
-                .id(2L)
-                .email("email@email.com")
-                .nickName("nickname")
-                .profileUrl("profileimage")
-                .build();
-
-        User caller = User. builder()
                 .id(1L)
-                .email("123@email.com")
+                .email("12345@email.com")
                 .nickName("nickname")
                 .profileUrl("profileimage")
                 .build();
-
-
-        String callerEmail = "123@email.com";
 
         BlogPost blogPost = BlogPost.builder()
                 .id(1L)
@@ -265,7 +231,7 @@ public class BlogPostServiceTest {
         /**
          * 게시글 작성자와 호출자가 다른경우, IllegalCallerException 발생 Test
          */
-        assertThrows(IllegalCallerException.class,()->blogPostService.deleteBlogPost(blogPostDto.getId(),callerEmail));
+        assertThrows(IllegalCallerException.class,()->blogPostService.deleteBlogPost(blogPostDto.getId()));
 
     }
 
@@ -309,10 +275,10 @@ public class BlogPostServiceTest {
         blogPosts.add(blogPost1);
         blogPosts.add(blogPost2);
         blogPosts.add(blogPost3);
-        when(blogPostRepository.findAllBlogPostByEmail(any(String.class))).thenReturn(Optional.of(blogPosts));
+        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class))).thenReturn(Optional.of(blogPosts));
 
         //when
-        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts("email@email.com");
+        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(2L);
 
         //then
         /**
@@ -362,10 +328,10 @@ public class BlogPostServiceTest {
 
         //when
         //
-        when(blogPostRepository.findAllBlogPostByEmail(any(String.class))).thenThrow(new NoSuchElementException());
+        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class))).thenThrow(new NoSuchElementException());
 
         //then
-        assertThrows(NoSuchElementException.class,()->blogPostService.getAllBlogPosts(""));
+        assertThrows(NoSuchElementException.class,()->blogPostService.getAllBlogPosts(0L));
 
     }
 
@@ -378,9 +344,9 @@ public class BlogPostServiceTest {
                 .nickName("nickname")
                 .profileUrl("profileimage")
                 .build();
-        when(blogPostRepository.findAllBlogPostByEmail(any(String.class))).thenReturn(Optional.of(new ArrayList<>()));
+        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class))).thenReturn(Optional.of(new ArrayList<>()));
         //when
-        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts("email@email.com");
+        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(2L);
 
         //then
         assertThat(blogPostDtos.size()).isEqualTo(0);

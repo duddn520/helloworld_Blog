@@ -7,6 +7,7 @@ import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.helloworldweb.helloworld_guestbook.repository.BlogPostRepository;
 import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +25,10 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     @Transactional
-    public BlogPostDto addBlogPost(BlogPostDto blogPostDto, String email) {
-
+    public BlogPostDto addBlogPost(BlogPostDto blogPostDto) {
+        User caller = getUserFromSecurityContextHolder();
         BlogPost blogPost = blogPostDto.toEntity();
-        User user = getUserByEmail(email);
-        blogPost.updateUser(user);
+        blogPost.updateUser(caller);
         return new BlogPostDto(blogPostRepository.save(blogPost));
 
     }
@@ -44,9 +44,9 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     //댓글이나 대댓글, 작성자를 표시할 필요 없어 지연로딩 관련 서비스 불필요.
-    public List<BlogPostDto> getAllBlogPosts(String email) {
+    public List<BlogPostDto> getAllBlogPosts(Long userId) {
 
-        List<BlogPost> blogPosts = getAllBlogPostsByEmail(email);
+        List<BlogPost> blogPosts = getAllBlogPostsById(userId);
 
         List<BlogPostDto> blogPostDtos  = blogPosts.stream().map((b)->new BlogPostDto(b)).collect(Collectors.toList());
 
@@ -56,10 +56,11 @@ public class BlogPostServiceImpl implements BlogPostService{
     }
 
     @Override
-    public BlogPostDto updateBlogPost(BlogPostDto blogPostDto, String callerEmail){
+    public BlogPostDto updateBlogPost(BlogPostDto blogPostDto){
 
+        User caller = getUserFromSecurityContextHolder();
         BlogPost blogPost = getBlogPostWithUserByID(blogPostDto.getId());
-        if(vaildateCaller(blogPost.getUser().getEmail(),callerEmail)){
+        if(vaildateCaller(blogPost.getUser().getEmail(),caller.getEmail())){
             blogPost.updateBlogPost(blogPostDto);
             return new BlogPostDto(blogPostRepository.save(blogPost)); // 갱신된 BlogPost객체 Dto화 하기위해 DirtyCheck 대신 직접 save
         }
@@ -71,9 +72,10 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     @Transactional
-    public void deleteBlogPost(Long blogPostId, String callerEmail){
+    public void deleteBlogPost(Long blogPostId){
+        User caller = getUserFromSecurityContextHolder();
         BlogPost blogPost = getBlogPostWithUserByID(blogPostId);
-        if(vaildateCaller(blogPost.getUser().getEmail(),callerEmail)){
+        if(vaildateCaller(blogPost.getUser().getEmail(),caller.getEmail())){
             blogPostRepository.delete(blogPost);
         }else{
             throw new IllegalCallerException("게시글 작성자만 삭제할 수 있습니다.");
@@ -89,8 +91,8 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     }
 
-    private List<BlogPost> getAllBlogPostsByEmail(String email){
-        return blogPostRepository.findAllBlogPostByEmail(email).orElseGet(()->new ArrayList<>());
+    private List<BlogPost> getAllBlogPostsById(Long userId){
+        return blogPostRepository.findAllBlogPostByUserId(userId).orElseGet(()->new ArrayList<>());
     }
 
     private boolean vaildateCaller(String writerEmail, String callerEmail){
@@ -99,5 +101,9 @@ public class BlogPostServiceImpl implements BlogPostService{
         }else{
             return false;
         }
+    }
+
+    private User getUserFromSecurityContextHolder(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

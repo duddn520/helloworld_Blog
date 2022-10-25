@@ -3,6 +3,7 @@ package com.helloworldweb.helloworld_guestbook.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,20 @@ public class JwtTokenService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String createToken(String email) {
+        Claims claims = Jwts.claims().setSubject(email);
+
+        long now = (new Date()).getTime();
+        Date validTime = new Date(now + TOKEN_VALID_TIME);
+
+        return Jwts.builder()
+                .setClaims(claims) // 데이터
+                .setIssuedAt(new Date(now))   // 토큰 발행 일자
+                .setExpiration(validTime) // 만료 기간
+                .signWith(key, SignatureAlgorithm.HS256) // 암호화 알고리즘, secret 값
+                .compact(); // Token 생성
     }
 
     public Authentication getAuthentication(String token){

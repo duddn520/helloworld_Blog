@@ -27,8 +27,10 @@ public class BlogPostServiceImpl implements BlogPostService{
     @Transactional
     public BlogPostDto addBlogPost(BlogPostDto blogPostDto) {
         User caller = getUserFromSecurityContextHolder();
+
+        User writer = getUserWithBlogPostsByUserId(caller.getId());
         BlogPost blogPost = blogPostDto.toEntity();
-        blogPost.updateUser(caller);
+        blogPost.updateUser(writer);
         return new BlogPostDto(blogPostRepository.save(blogPost));
 
     }
@@ -60,7 +62,7 @@ public class BlogPostServiceImpl implements BlogPostService{
 
         User caller = getUserFromSecurityContextHolder();
         BlogPost blogPost = getBlogPostWithUserByID(blogPostDto.getId());
-        if(vaildateCaller(blogPost.getUser().getEmail(),caller.getEmail())){
+        if(vaildateCaller(blogPost.getUser().getId(),caller.getId())){
             blogPost.updateBlogPost(blogPostDto);
             return new BlogPostDto(blogPostRepository.save(blogPost)); // 갱신된 BlogPost객체 Dto화 하기위해 DirtyCheck 대신 직접 save
         }
@@ -75,7 +77,7 @@ public class BlogPostServiceImpl implements BlogPostService{
     public void deleteBlogPost(Long blogPostId){
         User caller = getUserFromSecurityContextHolder();
         BlogPost blogPost = getBlogPostWithUserByID(blogPostId);
-        if(vaildateCaller(blogPost.getUser().getEmail(),caller.getEmail())){
+        if(vaildateCaller(blogPost.getUser().getId(),caller.getId())){
             blogPostRepository.delete(blogPost);
         }else{
             throw new IllegalCallerException("게시글 작성자만 삭제할 수 있습니다.");
@@ -95,15 +97,20 @@ public class BlogPostServiceImpl implements BlogPostService{
         return blogPostRepository.findAllBlogPostByUserId(userId).orElseGet(()->new ArrayList<>());
     }
 
-    private boolean vaildateCaller(String writerEmail, String callerEmail){
-        if (writerEmail.equals(callerEmail)){
+    private boolean vaildateCaller(Long writerId, Long callerId){
+        if (writerId.equals(callerId)){
             return true;
         }else{
             return false;
         }
     }
 
-    private User getUserFromSecurityContextHolder(){
+    private User getUserFromSecurityContextHolder() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private User getUserWithBlogPostsByUserId(Long userId){
+        return userRepository.findUserWithBlogPostsById(userId)
+                .orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
     }
 }

@@ -14,6 +14,7 @@ import com.helloworldweb.helloworld_guestbook.service.BlogPostService;
 import com.helloworldweb.helloworld_guestbook.service.GuestBookService;
 import com.helloworldweb.helloworld_guestbook.service.PostSubCommentService;
 import com.helloworldweb.helloworld_guestbook.service.UserService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,10 +67,16 @@ public class BlogPostControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
-    private String token = "";
-
     @Test
     void registerBlogPost_Success() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .email("email@email.com")
+                .build();
+
+        userService.addUser(userDto);
+
+        String token = jwtTokenService.createToken("email@email.com");
+
         System.out.println("############################################");
         BlogPostDto blogPostDto = BlogPostDto.builder()
                 .content("newcontent1!!!!!!")
@@ -91,6 +98,14 @@ public class BlogPostControllerTest {
 
     @Test
     void registerBlogPost_Fail_WithoutJWT() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .email("email@email.com")
+                .build();
+
+        userService.addUser(userDto);
+
+        String token = jwtTokenService.createToken("email@email.com");
+
         System.out.println("########################");
 
         BlogPostDto blogPostDto = BlogPostDto.builder()

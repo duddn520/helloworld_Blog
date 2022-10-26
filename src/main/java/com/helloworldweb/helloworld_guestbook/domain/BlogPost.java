@@ -30,11 +30,11 @@ public class BlogPost {
     // 조회수
     private Long views = 0L;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "blogPost",cascade = CascadeType.ALL)
     private List<PostComment> postComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)

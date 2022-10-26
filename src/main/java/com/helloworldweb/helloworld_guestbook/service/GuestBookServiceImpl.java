@@ -24,7 +24,7 @@ public class GuestBookServiceImpl implements GuestBookService{
     @Override
     @Transactional
     public GuestBookDto addGuestBookComment(Long userId, GuestBookCommentDto guestBookCommentDto, String email) {
-        User owner = getUserById(userId);
+        User owner = getUserWithGuestBookById(userId);
         User writer = getUserByEmail(email);
         GuestBook guestBook = owner.getGuestBook();
         GuestBookComment guestBookComment = guestBookCommentDto.toEntity();
@@ -32,20 +32,22 @@ public class GuestBookServiceImpl implements GuestBookService{
         guestBookComment.updateGuestBook(guestBook);
         guestBookComment.updateUser(writer);
 
+        //ID를 얻기 위해 GuestBookComment를 저장. 연관관계 + cascade를 통해 등록하면, 트랜잭션 유지 기간중에는 아이디를 얻을 수 없음.(Transient 객체를 반환)
+        guestBookCommentRepository.save(guestBookComment);
+
         return new GuestBookDto(guestBook);
     }
 
     @Override
     public GuestBookDto getGuestBook(Long userId) {
-        User user = getUserById(userId);
-        return new GuestBookDto(user.getGuestBook());
+        GuestBookDto guestBookDto =  new GuestBookDto(getUserWithGuestBookWithGueestBookCommentById(userId).getGuestBook());
+        return guestBookDto;
     }
 
     @Override
-    @Transactional
     public GuestBookCommentDto updateGuestBookComment(GuestBookCommentDto guestBookCommentDto, String email) {
-        if (validateCaller(guestBookCommentDto,email)) {
-            GuestBookComment guestBookComment = getGuestBookCommentById(guestBookCommentDto.getId());
+        GuestBookComment guestBookComment = getGuestBookCommentWithUserById(guestBookCommentDto.getId());
+        if (validateCaller(guestBookComment.getUser().getEmail(),email)) {
             return new GuestBookCommentDto(guestBookComment.updateGuestBookComment(guestBookCommentDto));
         }else{
             throw new IllegalCallerException("방명록 작성자만 수정할 수 있습니다.");
@@ -53,20 +55,14 @@ public class GuestBookServiceImpl implements GuestBookService{
     }
 
     @Override
-    @Transactional
     public void deleteGuestBookComment(Long guestBookCommentId, String email) {
-        GuestBookComment guestBookComment = getGuestBookCommentById(guestBookCommentId);
-        if(validateCaller(new GuestBookCommentDto(guestBookComment),email)) {
+        GuestBookComment guestBookComment = getGuestBookCommentWithUserById(guestBookCommentId);
+        if(validateCaller(guestBookComment.getUser().getEmail(),email)) {
             guestBookCommentRepository.delete(guestBookComment);
         }else{
             throw new IllegalCallerException("방명록 작성자만 삭제할 수 있습니다.");
 
         }
-    }
-
-    private User getUserById(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-        return user;
     }
 
     private User getUserByEmail(String email){
@@ -79,11 +75,26 @@ public class GuestBookServiceImpl implements GuestBookService{
         return guestBookComment;
     }
 
-    private boolean validateCaller(GuestBookCommentDto guestBookCommentDto, String email){
-        if( guestBookCommentDto.getUserId().equals(getUserByEmail(email).getId())){
+    private GuestBookComment getGuestBookCommentWithUserById(Long guestBookCommendId){
+        return guestBookCommentRepository.findGuestBookCommentWithUserById(guestBookCommendId).orElseThrow(()-> new NoSuchElementException("해당 방명록이 존재하지 않습니다."));
+    }
+
+    private boolean validateCaller(String email, String callerEmail){
+        if(email.equals(callerEmail)){
             return true;
         }else{
             return false;
         }
+    }
+
+    private User getUserWithGuestBookWithGueestBookCommentById(Long userId){
+        User user = userRepository.findUserWithGuestBookWithGuestBookCommentsbyId(userId).orElseThrow
+                (()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        return user;
+    }
+
+    private User getUserWithGuestBookById(Long userId){
+        User user = userRepository.findUserWithGuestBookById(userId).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        return user;
     }
 }

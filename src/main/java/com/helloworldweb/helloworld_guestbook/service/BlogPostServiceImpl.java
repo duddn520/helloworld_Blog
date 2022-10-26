@@ -4,6 +4,7 @@ package com.helloworldweb.helloworld_guestbook.service;
 import com.helloworldweb.helloworld_guestbook.domain.BlogPost;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
+import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.repository.BlogPostRepository;
 import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class BlogPostServiceImpl implements BlogPostService{
     //댓글, 대댓글, 대댓글을 단 user 모두 표시해야하기 때문에 지연로딩 필요.
     public BlogPostDto getBlogPost(Long id){
         BlogPost blogPost = getBlogPostWithUserByID(id);
-        return new BlogPostDto(blogPost);
+        return new BlogPostDto(blogPost, blogPost.getPostComments() );
     }
 
     @Override
@@ -50,7 +51,7 @@ public class BlogPostServiceImpl implements BlogPostService{
 
         List<BlogPost> blogPosts = getAllBlogPostsById(userId);
 
-        List<BlogPostDto> blogPostDtos  = blogPosts.stream().map((b)->new BlogPostDto(b)).collect(Collectors.toList());
+        List<BlogPostDto> blogPostDtos = blogPosts.stream().map((b)->new BlogPostDto(b)).collect(Collectors.toList());
 
         return blogPostDtos;
 
@@ -58,6 +59,7 @@ public class BlogPostServiceImpl implements BlogPostService{
     }
 
     @Override
+    @Transactional
     public BlogPostDto updateBlogPost(BlogPostDto blogPostDto){
 
         String callerEmail = getUserEmailFromSecurityContextHolder();

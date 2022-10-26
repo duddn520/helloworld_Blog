@@ -104,8 +104,6 @@ public class BlogPostControllerTest {
 
         userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
-
         System.out.println("########################");
 
         BlogPostDto blogPostDto = BlogPostDto.builder()
@@ -125,4 +123,38 @@ public class BlogPostControllerTest {
                 .andDo(print());
 
     }
+
+    //kafka 오류시 처리방향(addUser)
+    @Test
+    void registerBlogPost_Fail_NotExistingUser() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .email("email@email.com")
+                .build();
+
+        userService.addUser(userDto);
+
+        String token = jwtTokenService.createToken("123@email.com");
+
+        System.out.println("########################");
+
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .content("newcontent1!!!!!!")
+                .title("title123123123123")
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(blogPostDto);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/blogpost")
+                .header("Auth",token)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(requestBuilder)
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+
+    }
+
+    // TODO: 2022/10/25 추가 컨트롤러 구현
 }

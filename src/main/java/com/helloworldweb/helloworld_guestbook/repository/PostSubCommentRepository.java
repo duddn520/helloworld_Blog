@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface PostSubCommentRepository extends JpaRepository<PostSubComment,Long> {
     Optional<List<PostSubComment>> findAllByUserId(Long userId);
 
-    @Query(value = "select psc from PostSubComment psc join fetch psc.user where psc.id = :postSubCommentId")
+    @Query(value = "select psc from PostSubComment psc left join fetch psc.user where psc.id = :postSubCommentId")
     Optional<PostSubComment> findPostSubCommentWithUserById(@Param(value = "postSubCommentId")Long postSubCommentId);
 }

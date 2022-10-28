@@ -9,19 +9,17 @@ public interface PostSubCommentService {
      * createPostSubComment - PostSubComment 생성, 새로운 PostComment 객체를 Post객체에 연관하고, PostComment에 새로운 PostSubComment 객체 추가.
      * @param postId - 댓글을 달 Post의 id
      * @param postSubCommentDto - 댓글 내용을 가진 Dto, PostSubCommentDto
-     * @param writerEmail - 작성자의 Email
      * @return 작성 성공한 PostSubComment의 Dto
      */
-    PostSubCommentDto createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto,String writerEmail);
+    PostSubCommentDto createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto);
 
     /**
      * addPostSubComment - 이미 존재하는 PostComment에 댓글 추가, 기존 존재하는 PostComment 객체 찾고, User연관.
      * @param postCommentID - 댓글을 추가할 PostComment 의 Id
      * @param postSubCommentDto - 댓글 내용을 가진 Dto
-     * @param writerEmail - 작성자의 Email
      * @return 작성 성공한 PostSubComment의 Dto
      */
-    PostSubCommentDto addPostSubComment(Long postCommentID, PostSubCommentDto postSubCommentDto, String writerEmail);
+    PostSubCommentDto addPostSubComment(Long postCommentID, PostSubCommentDto postSubCommentDto);
 
     /** R
      * getPostSubComment - PostSubcomment를 조회하는 메서드.
@@ -40,16 +38,14 @@ public interface PostSubCommentService {
     /** U
      * updatePostSubComment - PostSubComment의 내용물 update, 작성자 일치시에만 수정 가능.
      * @param postSubCommentDto - 수정할 댓글의 정보가 담긴 PostSubCommentDto
-     * @param modifierEmail - 수정 요청자의 Email
      * @return 수정 완료 이후의 PostSubComment의 Dto
      */
-    PostSubCommentDto updatePostSubComment(PostSubCommentDto postSubCommentDto, String modifierEmail);
+    PostSubCommentDto updatePostSubComment(PostSubCommentDto postSubCommentDto);
 
     /** U
      * deletePostSubComment - PostSubComment의 삭제, 실제 삭제는 이루어지지 않고, content ->"삭제된 게시물입니다." 로 update
      * @param postSubCommentId - 내용물을 삭제된 댓글로 바꾸기 위한 PostSubComment의 ID
-     * @param callerEmail - 삭제 요청자의 Email.
      */
-    void deletePostSubComment(Long postSubCommentId, String callerEmail);
+    void deletePostSubComment(Long postSubCommentId);
 
 }

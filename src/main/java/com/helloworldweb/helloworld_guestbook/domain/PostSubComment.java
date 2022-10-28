@@ -50,4 +50,10 @@ public class PostSubComment {
         return this;
     }
 
+    public void delete(){
+        this.user.getPostSubComments().remove(this);
+        this.user = null;
+        this.content = "삭제된 댓글입니다.";
+    }
+
 }

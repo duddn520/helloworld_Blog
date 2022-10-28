@@ -10,6 +10,7 @@ import com.helloworldweb.helloworld_guestbook.repository.PostCommentRepository;
 import com.helloworldweb.helloworld_guestbook.repository.PostSubCommentRepository;
 import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +31,12 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     @Override
     @Transactional
     //첫번째 댓글 작성.(존재하지 않는 PostComment)
-    public PostSubCommentDto createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto, String writerEmail) {
+    public PostSubCommentDto createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto) {
+        String callerEmail = getCallerEmailFromSecurityContextHolder();
         BlogPost blogPost = getBlogPostById(postId);
         PostComment postComment = PostComment.builder().build();
         PostSubComment postSubComment = postSubCommentDto.toEntity();
-        User writer = getUserByEmail(writerEmail);
+        User writer = getUserByEmail(callerEmail);
 
         //연관관계 주입(PostComment)
         postComment.updateBlogPost(blogPost);
@@ -52,12 +54,13 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     @Override
     @Transactional
     //존재하는 PostComment에 PostSubComment 추가.
-    public PostSubCommentDto addPostSubComment(Long postCommentId, PostSubCommentDto postSubCommentDto, String writerEmail) {
+    public PostSubCommentDto addPostSubComment(Long postCommentId, PostSubCommentDto postSubCommentDto) {
+        String callerEmail = getCallerEmailFromSecurityContextHolder();
         PostComment postComment = getPostCommentById(postCommentId);
-        User writer = getUserByEmail(writerEmail);
+        User caller = getUserByEmail(callerEmail);
 
         PostSubComment postSubComment = postSubCommentDto.toEntity();
-        postSubComment.updateUser(writer);
+        postSubComment.updateUser(caller);
         postSubComment.updatePostComment(postComment);
 
         postSubCommentRepository.save(postSubComment);
@@ -79,9 +82,10 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     }
 
     @Override
-    public PostSubCommentDto updatePostSubComment(PostSubCommentDto postSubCommentDto, String modifierEmail) {
+    public PostSubCommentDto updatePostSubComment(PostSubCommentDto postSubCommentDto) {
+        String callerEmail = getCallerEmailFromSecurityContextHolder();
         PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentDto.getId());
-        if (validateCaller(postSubComment.getUser().getEmail(),modifierEmail)) {
+        if (validateCaller(postSubComment.getUser().getEmail(),callerEmail)) {
             return new PostSubCommentDto(postSubComment.updatePostSubComment(postSubCommentDto));
         }else{
             throw new IllegalCallerException("댓글 작성자만 수정할 수 있습니다.");
@@ -89,11 +93,13 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     }
 
     @Override
-    public void deletePostSubComment(Long postSubCommentId, String callerEmail) {
+    //실제 데이터를 지우지 않고, 유저 연관을 끊고 내용 바꿈, postsubcomment -> user == null
+    public void deletePostSubComment(Long postSubCommentId) {
+        String callerEmail = getCallerEmailFromSecurityContextHolder();
         PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentId);
         String commentEmail = postSubComment.getUser().getEmail();
         if(validateCaller(commentEmail,callerEmail)){
-            postSubCommentRepository.delete(postSubComment);
+            postSubComment.delete();
         }else{
             throw new IllegalCallerException("댓글 작성자만 삭제할 수 있습니다.");
         }
@@ -127,5 +133,10 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
         }else{
             return false;
         }
+    }
+
+    private String getCallerEmailFromSecurityContextHolder(){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return user.getEmail();
     }
 }

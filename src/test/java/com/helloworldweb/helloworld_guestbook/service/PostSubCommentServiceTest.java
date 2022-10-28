@@ -16,11 +16,10 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,6 +76,11 @@ public class PostSubCommentServiceTest {
             .blogPost(testBlogPost1)
             .build();
 
+    @BeforeEach
+    void ContextHolder등록(){
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(testUser2,"", testUser2.getAuthorities()));
+    }
+
     @Test
     void 댓글생성_성공(){
         //given
@@ -87,7 +91,7 @@ public class PostSubCommentServiceTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser2));
         when(postSubCommentRepository.save(any(PostSubComment.class))).then(AdditionalAnswers.returnsFirstArg());
         //when
-        PostSubCommentDto returnDto = postSubCommentService.createPostSubComment(testBlogPost1.getId(),postSubCommentDto,testUser2Email);
+        PostSubCommentDto returnDto = postSubCommentService.createPostSubComment(testBlogPost1.getId(),postSubCommentDto);
 
         //then
         //값 확인
@@ -109,7 +113,7 @@ public class PostSubCommentServiceTest {
 
         //when
         //then
-        assertThrows(NoSuchElementException.class,()-> postSubCommentService.createPostSubComment(999L,postSubCommentDto,testUser1Email));
+        assertThrows(NoSuchElementException.class,()-> postSubCommentService.createPostSubComment(999L,postSubCommentDto));
 
     }
 
@@ -124,7 +128,7 @@ public class PostSubCommentServiceTest {
         when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         //when
         //then
-        assertThrows(NoSuchElementException.class, ()-> postSubCommentService.createPostSubComment(testBlogPost1.getId(),postSubCommentDto,"123123123123123"));
+        assertThrows(NoSuchElementException.class, ()-> postSubCommentService.createPostSubComment(testBlogPost1.getId(),postSubCommentDto));
 
 
     }
@@ -141,7 +145,7 @@ public class PostSubCommentServiceTest {
         when(postSubCommentRepository.save(any(PostSubComment.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when
-        PostSubCommentDto savedDto = postSubCommentService.addPostSubComment(testPostComment1.getId(),postSubCommentDto,testUser2Email);
+        PostSubCommentDto savedDto = postSubCommentService.addPostSubComment(testPostComment1.getId(),postSubCommentDto);
 
         //then
         //값 확인
@@ -162,7 +166,7 @@ public class PostSubCommentServiceTest {
         when(postCommentRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
         //when
         //then
-        assertThrows(NoSuchElementException.class,()-> postSubCommentService.addPostSubComment(999L,postSubCommentDto,testUser2Email));
+        assertThrows(NoSuchElementException.class,()-> postSubCommentService.addPostSubComment(999L,postSubCommentDto));
 
     }
 
@@ -179,7 +183,7 @@ public class PostSubCommentServiceTest {
         //when
         //then
 
-        assertThrows(NoSuchElementException.class,()->postSubCommentService.addPostSubComment(5L,postSubCommentDto,"345678923123@email.com"));
+        assertThrows(NoSuchElementException.class,()->postSubCommentService.addPostSubComment(5L,postSubCommentDto));
 
     }
 
@@ -292,7 +296,7 @@ public class PostSubCommentServiceTest {
                 .content("subcomment1")
                 .build();
         existingPostSubComment.updatePostComment(testPostComment1);
-        existingPostSubComment.updateUser(testUser1);
+        existingPostSubComment.updateUser(testUser2);
 
         PostSubCommentDto postSubCommentDto = PostSubCommentDto.builder()
                 .id(existingPostSubComment.getId())
@@ -302,13 +306,13 @@ public class PostSubCommentServiceTest {
 
         when(postSubCommentRepository.findPostSubCommentWithUserById(any(Long.class))).thenReturn(Optional.of(existingPostSubComment));
         //when
-        PostSubCommentDto returnDto = postSubCommentService.updatePostSubComment(postSubCommentDto,testUser1Email);
+        PostSubCommentDto returnDto = postSubCommentService.updatePostSubComment(postSubCommentDto);
 
         //then
         //값 및 연관 확인
         assertThat(returnDto.getContent()).isEqualTo("updated content");
         assertThat(returnDto.getId()).isEqualTo(existingPostSubComment.getId());
-        assertThat(returnDto.getUserDto().getId()).isEqualTo(testUser1.getId());
+        assertThat(returnDto.getUserDto().getId()).isEqualTo(testUser2.getId());
 
     }
 
@@ -333,7 +337,7 @@ public class PostSubCommentServiceTest {
 
         //when
         //then
-        assertThrows(NoSuchElementException.class, ()-> postSubCommentService.updatePostSubComment(postSubCommentDto,testUser1Email));
+        assertThrows(NoSuchElementException.class, ()-> postSubCommentService.updatePostSubComment(postSubCommentDto));
     }
 
     @Test
@@ -357,8 +361,28 @@ public class PostSubCommentServiceTest {
 
         //when
         //then
-        assertThrows(IllegalCallerException.class,()-> postSubCommentService.updatePostSubComment(postSubCommentDto,testUser2Email));
+        assertThrows(IllegalCallerException.class,()-> postSubCommentService.updatePostSubComment(postSubCommentDto));
 
+    }
+    
+    @Test
+    void 댓글삭제_성공(){
+        //given
+        PostSubComment existingPostSubComment = PostSubComment.builder()
+                .id(6L)
+                .content("subcomment1")
+                .build();
+        existingPostSubComment.updatePostComment(testPostComment1);
+        existingPostSubComment.updateUser(testUser2);
+
+        when(postSubCommentRepository.findPostSubCommentWithUserById(any(Long.class))).thenReturn(Optional.of(existingPostSubComment));
+
+        //when
+        postSubCommentService.deletePostSubComment(6L);
+        //then
+        assertThat(testUser2.getPostSubComments().size()).isEqualTo(0);
+        assertThat(existingPostSubComment.getUser()).isEqualTo(null);
+        assertThat(existingPostSubComment.getContent()).isEqualTo("삭제된 댓글입니다.");
     }
 
     @Test
@@ -375,7 +399,7 @@ public class PostSubCommentServiceTest {
 
         //when
         //then
-        assertThrows(NoSuchElementException.class,()->postSubCommentService.deletePostSubComment(999L,testUser1Email));
+        assertThrows(NoSuchElementException.class,()->postSubCommentService.deletePostSubComment(999L));
 
     }
 
@@ -392,7 +416,7 @@ public class PostSubCommentServiceTest {
         when(postSubCommentRepository.findPostSubCommentWithUserById(any(Long.class))).thenReturn(Optional.of(existingPostSubComment));
         //when
         //then
-        assertThrows(IllegalCallerException.class,()-> postSubCommentService.deletePostSubComment(existingPostSubComment.getId(),testUser2Email));
+        assertThrows(IllegalCallerException.class,()-> postSubCommentService.deletePostSubComment(existingPostSubComment.getId()));
 
 
     }

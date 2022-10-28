@@ -85,7 +85,12 @@ public class BlogPostController {
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.OK,
                     HttpResponseMsg.PUT_SUCCESS, savedDto), HttpStatus.OK);
-        }catch (IllegalCallerException e){
+        }catch (ClassCastException e){
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.UNAUTHORIZED,
+                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
+        }
+        catch (IllegalCallerException e){
             //게시물 작성자와 메소드 요청자가 다른 경우.
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.UNAUTHORIZED,
@@ -106,7 +111,12 @@ public class BlogPostController {
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.OK,
                     HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
-        }catch (IllegalCallerException e){
+        }catch (ClassCastException e){
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.UNAUTHORIZED,
+                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
+        }
+        catch (IllegalCallerException e){
             //게시물 작성자와 메소드 요청자가 다른 경우.
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.UNAUTHORIZED,

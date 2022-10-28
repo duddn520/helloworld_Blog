@@ -80,6 +80,10 @@ public class GuestBookController {
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.UNAUTHORIZED,
                     HttpResponseMsg.FORBIDDEN), HttpStatus.UNAUTHORIZED);
+        }catch (NoSuchElementException e){
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.BAD_REQUEST,
+                    HttpResponseMsg.NO_CONTENT), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -98,6 +102,10 @@ public class GuestBookController {
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.UNAUTHORIZED,
                     HttpResponseMsg.FORBIDDEN), HttpStatus.UNAUTHORIZED);
+        }catch (NoSuchElementException e){
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.BAD_REQUEST,
+                    HttpResponseMsg.NO_CONTENT), HttpStatus.BAD_REQUEST);
         }
     }
 

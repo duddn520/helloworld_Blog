@@ -15,11 +15,10 @@ public interface PostSubCommentService {
 
     /**
      * addPostSubComment - 이미 존재하는 PostComment에 댓글 추가, 기존 존재하는 PostComment 객체 찾고, User연관.
-     * @param postCommentID - 댓글을 추가할 PostComment 의 Id
      * @param postSubCommentDto - 댓글 내용을 가진 Dto
      * @return 작성 성공한 PostSubComment의 Dto
      */
-    PostSubCommentDto addPostSubComment(Long postCommentID, PostSubCommentDto postSubCommentDto);
+    PostSubCommentDto addPostSubComment(PostSubCommentDto postSubCommentDto);
 
     /** R
      * getPostSubComment - PostSubcomment를 조회하는 메서드.
@@ -33,7 +32,7 @@ public interface PostSubCommentService {
      * @param userId - 댓글 작성한 유저 ID
      * @return 작성한 댓글들의 Dto
      */
-    List<PostSubCommentDto> getAllMySubComments(Long userId);
+    List<PostSubCommentDto> getAllSubCommentsByUserId(Long userId);
 
     /** U
      * updatePostSubComment - PostSubComment의 내용물 update, 작성자 일치시에만 수정 가능.

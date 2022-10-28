@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@Transactional
 public class PostSubCommentServiceTest {
 
     @Mock
@@ -137,15 +139,16 @@ public class PostSubCommentServiceTest {
     void 댓글추가_성공(){
         //given
         PostSubCommentDto postSubCommentDto = PostSubCommentDto.builder()
+                .postCommentId(5L)
                 .content("new subcomment123")
                 .build();
 
-        when(postCommentRepository.findById(any(Long.class))).thenReturn(Optional.of(testPostComment1));
+        when(postCommentRepository.findPostCommentWithPostSubCommentsById(any(Long.class))).thenReturn(Optional.of(testPostComment1));
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser2));
         when(postSubCommentRepository.save(any(PostSubComment.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when
-        PostSubCommentDto savedDto = postSubCommentService.addPostSubComment(testPostComment1.getId(),postSubCommentDto);
+        PostSubCommentDto savedDto = postSubCommentService.addPostSubComment(postSubCommentDto);
 
         //then
         //값 확인
@@ -160,13 +163,14 @@ public class PostSubCommentServiceTest {
     void 댓글추가_잘못된PostCommentId(){
         //given
         PostSubCommentDto postSubCommentDto = PostSubCommentDto.builder()
+                .postCommentId(5L)
                 .content("new subcomment123")
                 .build();
 
-        when(postCommentRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
+        when(postCommentRepository.findPostCommentWithPostSubCommentsById(any(Long.class))).thenThrow(new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
         //when
         //then
-        assertThrows(NoSuchElementException.class,()-> postSubCommentService.addPostSubComment(999L,postSubCommentDto));
+        assertThrows(NoSuchElementException.class,()-> postSubCommentService.addPostSubComment(postSubCommentDto));
 
     }
 
@@ -174,16 +178,17 @@ public class PostSubCommentServiceTest {
     void 댓글추가_잘못된WriterEmail(){
         //given
         PostSubCommentDto postSubCommentDto = PostSubCommentDto.builder()
+                .postCommentId(5L)
                 .content("new subcomment123")
                 .build();
 
-        when(postCommentRepository.findById(any(Long.class))).thenReturn(Optional.of(testPostComment1));
+        when(postCommentRepository.findPostCommentWithPostSubCommentsById(any(Long.class))).thenReturn(Optional.of(testPostComment1));
         when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
 
         //when
         //then
 
-        assertThrows(NoSuchElementException.class,()->postSubCommentService.addPostSubComment(5L,postSubCommentDto));
+        assertThrows(NoSuchElementException.class,()->postSubCommentService.addPostSubComment(postSubCommentDto));
 
     }
 
@@ -236,6 +241,7 @@ public class PostSubCommentServiceTest {
     void 댓글전체조회_성공(){
         //given
         //연관이 주입되어있는 존재하는 postsubcomment 객체들
+        testUser1.getPostSubComments().clear();
         PostSubComment existingPostSubComment1 = PostSubComment.builder()
                 .id(6L)
                 .content("subcomment1")
@@ -257,16 +263,10 @@ public class PostSubCommentServiceTest {
         existingPostSubComment3.updatePostComment(testPostComment1);
         existingPostSubComment3.updateUser(testUser1);
 
-        List<PostSubComment> postSubComments = new ArrayList<>();
-        postSubComments.add(existingPostSubComment1);
-        postSubComments.add(existingPostSubComment2);
-        postSubComments.add(existingPostSubComment3);
-
-
-        when(postSubCommentRepository.findAllByUserId(any(Long.class))).thenReturn(Optional.of(postSubComments));
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(testUser1));
 
         //when
-        List<PostSubCommentDto> returnDtos = postSubCommentService.getAllMySubComments(testUser1.getId());
+        List<PostSubCommentDto> returnDtos = postSubCommentService.getAllSubCommentsByUserId(testUser1.getId());
         //then
         //값 확인
         assertThat(returnDtos.size()).isEqualTo(3);
@@ -279,11 +279,11 @@ public class PostSubCommentServiceTest {
     @Test
     void 댓글전체조회_잘못된UserID(){
         //given
-        when(postSubCommentRepository.findAllByUserId(any(Long.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-
+        when(userRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         //when
         //then
-        assertThrows(NoSuchElementException.class,()-> postSubCommentService.getAllMySubComments(999L));
+        assertThrows(NoSuchElementException.class,()-> postSubCommentService.getAllSubCommentsByUserId(999L));
+
 
     }
 
@@ -368,6 +368,7 @@ public class PostSubCommentServiceTest {
     @Test
     void 댓글삭제_성공(){
         //given
+        testUser2.getPostSubComments().clear();
         PostSubComment existingPostSubComment = PostSubComment.builder()
                 .id(6L)
                 .content("subcomment1")

@@ -54,9 +54,9 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     @Override
     @Transactional
     //존재하는 PostComment에 PostSubComment 추가.
-    public PostSubCommentDto addPostSubComment(Long postCommentId, PostSubCommentDto postSubCommentDto) {
+    public PostSubCommentDto addPostSubComment(PostSubCommentDto postSubCommentDto) {
         String callerEmail = getCallerEmailFromSecurityContextHolder();
-        PostComment postComment = getPostCommentById(postCommentId);
+        PostComment postComment = getPostCommentWithPostSubCommentsById(postSubCommentDto.getPostCommentId());
         User caller = getUserByEmail(callerEmail);
 
         PostSubComment postSubComment = postSubCommentDto.toEntity();
@@ -69,19 +69,21 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PostSubCommentDto getPostSubComment(Long postSubCommentId) {
         PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentId);
         return new PostSubCommentDto(postSubComment);
     }
 
     @Override
-    @Transactional
-    public List<PostSubCommentDto> getAllMySubComments(Long userId) {
-        List<PostSubCommentDto> postSubCommentDtos = postSubCommentRepository.findAllByUserId(userId).orElseGet(()->new ArrayList<>()).stream().map((psc) -> new PostSubCommentDto(psc)).collect(Collectors.toList());
-        return postSubCommentDtos;
+    @Transactional(readOnly = true)
+    public List<PostSubCommentDto> getAllSubCommentsByUserId(Long userId) {
+        User user = getUserById(userId);
+        return user.getPostSubComments().stream().map((psc)-> new PostSubCommentDto(psc)).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public PostSubCommentDto updatePostSubComment(PostSubCommentDto postSubCommentDto) {
         String callerEmail = getCallerEmailFromSecurityContextHolder();
         PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentDto.getId());
@@ -93,6 +95,7 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     }
 
     @Override
+    @Transactional
     //실제 데이터를 지우지 않고, 유저 연관을 끊고 내용 바꿈, postsubcomment -> user == null
     public void deletePostSubComment(Long postSubCommentId) {
         String callerEmail = getCallerEmailFromSecurityContextHolder();
@@ -110,14 +113,17 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
         return blogPostRepository.findById(id).orElseThrow(()-> new NoSuchElementException("해당 포스트가 존재하지 않습니다."));
     }
 
-    private PostComment getPostCommentById(Long id){
-        return postCommentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
+    private PostComment getPostCommentWithPostSubCommentsById(Long id){
+        return postCommentRepository.findPostCommentWithPostSubCommentsById(id).orElseThrow(()-> new NoSuchElementException("댓글이 존재하지 않습니다."));
     }
 
     private User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
     }
-    
+
+    private User getUserById(Long id){
+        return userRepository.findById(id).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+    }
     private PostSubComment getPostSubCommentById(Long postSubCommentId){
         return postSubCommentRepository.findById(postSubCommentId).orElseThrow(()-> new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
         

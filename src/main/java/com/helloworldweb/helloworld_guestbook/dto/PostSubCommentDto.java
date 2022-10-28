@@ -8,18 +8,21 @@ import lombok.Getter;
 @Getter
 public class PostSubCommentDto {
     private Long id;
+    private Long postCommentId;
     private UserDto userDto;
     private String content;
 
     public PostSubCommentDto(PostSubComment postSubComment){
         this.id = postSubComment.getId();
+        this.postCommentId = postSubComment.getPostComment().getId();
         this.userDto = new UserDto(postSubComment.getUser());
         this.content = postSubComment.getContent();
     }
 
     @Builder
-    public PostSubCommentDto(Long id, UserDto userDto, String content){
+    public PostSubCommentDto(Long id,Long postCommentId ,UserDto userDto, String content){
         this.id = id;
+        this.postCommentId = postCommentId;
         this.userDto = userDto;
         this.content = content;
     }

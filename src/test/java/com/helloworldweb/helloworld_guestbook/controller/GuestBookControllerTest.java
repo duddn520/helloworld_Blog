@@ -49,10 +49,12 @@ public class GuestBookControllerTest {
     void registerGuestBookComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto callerDto = UserDto.builder()
+                .id(2L)
                 .email("caller@email.com")
                 .build();
 
@@ -86,10 +88,12 @@ public class GuestBookControllerTest {
     void registerGuestBookComment_Fail_NoJWT() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto callerDto = UserDto.builder()
+                .id(2L)
                 .email("caller@email.com")
                 .build();
 
@@ -119,6 +123,7 @@ public class GuestBookControllerTest {
     void registerGuestBookComment_Fail_NotExistingUserId() throws Exception{
         //given
         UserDto callerDto = UserDto.builder()
+                .id(1L)
                 .email("caller@email.com")
                 .build();
 
@@ -150,10 +155,12 @@ public class GuestBookControllerTest {
     void getGuestBook_Success() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -183,10 +190,12 @@ public class GuestBookControllerTest {
     void getGuestBook_Fail_NotExistingUser() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -215,10 +224,12 @@ public class GuestBookControllerTest {
     void updateGuestBookComment_Success() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -261,10 +272,12 @@ public class GuestBookControllerTest {
     void updateGuestBookComment_Fail_NoJWT() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -305,10 +318,12 @@ public class GuestBookControllerTest {
     void updateGuestbookComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -351,10 +366,12 @@ public class GuestBookControllerTest {
     void deleteGuestBookComment_Success() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -389,10 +406,12 @@ public class GuestBookControllerTest {
     void deleteGuestBookComment_Fail_NoJWT() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -423,10 +442,12 @@ public class GuestBookControllerTest {
     void deleteGuestBookComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 

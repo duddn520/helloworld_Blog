@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 public class User implements UserDetails {
 
-    @Id @GeneratedValue
+    @Id
     private Long id;
 
     @NotNull

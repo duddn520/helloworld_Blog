@@ -51,6 +51,7 @@ public class PostSubCommentControllerTest {
         //given
         //user 회원가입 및 blogPost 작성.
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -90,6 +91,7 @@ public class PostSubCommentControllerTest {
     void createPostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -127,6 +129,7 @@ public class PostSubCommentControllerTest {
         //given
         //user 회원가입 및 blogPost 작성.
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -168,6 +171,7 @@ public class PostSubCommentControllerTest {
     void addPostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -217,6 +221,7 @@ public class PostSubCommentControllerTest {
     void addPostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -264,6 +269,7 @@ public class PostSubCommentControllerTest {
     void addPostSubComment_Fail_NotFoundUser() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -313,6 +319,7 @@ public class PostSubCommentControllerTest {
     void getPostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -349,6 +356,7 @@ public class PostSubCommentControllerTest {
     void getPostSubComment_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -386,6 +394,7 @@ public class PostSubCommentControllerTest {
     void getAllPostSubCommentsById_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -428,6 +437,7 @@ public class PostSubCommentControllerTest {
     void getAllPostSubCommentsById_Fail_NotFoundUser() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -471,6 +481,7 @@ public class PostSubCommentControllerTest {
     void updatePostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -519,6 +530,7 @@ public class PostSubCommentControllerTest {
     void updatePostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -566,6 +578,7 @@ public class PostSubCommentControllerTest {
     void updatePostSubComment_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -613,6 +626,7 @@ public class PostSubCommentControllerTest {
     void updatePostSubComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -661,6 +675,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -701,6 +716,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -737,6 +753,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -775,6 +792,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 

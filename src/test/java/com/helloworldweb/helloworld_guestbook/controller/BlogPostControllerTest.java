@@ -56,6 +56,7 @@ public class BlogPostControllerTest {
     void registerBlogPost_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -87,6 +88,7 @@ public class BlogPostControllerTest {
     void registerBlogPost_Fail_WithoutJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -118,6 +120,7 @@ public class BlogPostControllerTest {
     void registerBlogPost_Fail_NotExistingUser() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -151,6 +154,7 @@ public class BlogPostControllerTest {
     void getAllBlogPostsByUserId_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -205,6 +209,7 @@ public class BlogPostControllerTest {
     void getAllBogPostsByUserID_Success_NoBlogPostUser() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -227,6 +232,7 @@ public class BlogPostControllerTest {
     void getBlogPostById_Success() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -259,6 +265,7 @@ public class BlogPostControllerTest {
     void getBlogPostsById_Fail_NoContent() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -282,6 +289,7 @@ public class BlogPostControllerTest {
     void updateBlogPost_Success() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -329,6 +337,7 @@ public class BlogPostControllerTest {
     void updateBlogPost_Fail_IllegalCaller() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("123@email.com")
                 .build();
 
@@ -375,6 +384,7 @@ public class BlogPostControllerTest {
     void updateBlogPost_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -398,6 +408,7 @@ public class BlogPostControllerTest {
     void deleteBlogPost_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -430,6 +441,7 @@ public class BlogPostControllerTest {
     void deleteBlogPost_Fail_IllegalCaller() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("123@email.com")
                 .build();
 
@@ -463,6 +475,7 @@ public class BlogPostControllerTest {
     void deleteBlogPost_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("123@email.com")
                 .build();
 

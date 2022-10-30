@@ -1,4 +1,4 @@
-package com.helloworldweb.helloworld_guestbook.Config;
+package com.helloworldweb.helloworld_guestbook.config;
 
 import com.helloworldweb.helloworld_guestbook.jwt.JwtAuthenticationFilter;
 import com.helloworldweb.helloworld_guestbook.jwt.JwtTokenService;

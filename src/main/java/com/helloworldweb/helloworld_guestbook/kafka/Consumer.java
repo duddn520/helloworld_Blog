@@ -6,9 +6,12 @@ import com.google.gson.JsonParser;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,20 +19,27 @@ public class Consumer {
 
     private final UserService userService;
 
+
     @KafkaListener(topics = "user_register",groupId = "user_register_guestbook")
     public void userRegisterListener(String dtoString, Acknowledgment ack){
         System.out.println("dtoString = " + dtoString);
         userService.addUser(messageToUserDto(dtoString));
+        ack.acknowledge();
+
     }
 
     @KafkaListener(topics = "user_update", groupId = "user_update_guestbook")
     public void userUpdateListener(String dtoString, Acknowledgment ack){
         userService.updateUser(messageToUserDto(dtoString));
+        ack.acknowledge();
+
     }
 
     @KafkaListener(topics = "user_delete", groupId = "user_delete_guestbook")
     public void userDeleteListener(String dtoString, Acknowledgment ack){
         userService.deleteUser(messageToUserDto(dtoString).getId());
+        ack.acknowledge();
+
     }
     private UserDto messageToUserDto(String jsonString ){
         JsonParser jsonParser = new JsonParser();
@@ -38,12 +48,12 @@ public class Consumer {
         UserDto userDto = UserDto.builder()
                 .id(json.get("id").getAsLong())
                 .email(json.get("email").getAsString())
-                .profileUrl(json.get("profileUrl").getAsString())
-                .nickName(json.get("nickName").getAsString())
-                .repoUrl(json.get("repoUrl").getAsString())
-                .profileMusicName(json.get("profileMusicName").getAsString())
-                .profileMusicUrl(json.get("profileMusicUrl").getAsString())
-                .fcm(json.get("fcm").getAsString())
+//                .profileUrl(json.get("profileUrl").getAsString())
+//                .nickName(json.get("nickName").getAsString())
+//                .repoUrl(json.get("repoUrl").getAsString())
+//                .profileMusicName(json.get("profileMusicName").getAsString())
+//                .profileMusicUrl(json.get("profileMusicUrl").getAsString())
+//                .fcm(json.get("fcm").getAsString())
                 .build();
         return userDto;
     }

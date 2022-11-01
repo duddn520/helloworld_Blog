@@ -90,7 +90,7 @@ public class PostSubCommentServiceTest {
                 .content("new subcomment")
                 .build();
         when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(testBlogPost1));
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser2));
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(testUser2));
         when(postSubCommentRepository.save(any(PostSubComment.class))).then(AdditionalAnswers.returnsFirstArg());
         //when
         PostSubCommentDto returnDto = postSubCommentService.createPostSubComment(testBlogPost1.getId(),postSubCommentDto);
@@ -127,7 +127,7 @@ public class PostSubCommentServiceTest {
                 .build();
 
         when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(testBlogPost1));
-        when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        when(userRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         //when
         //then
         assertThrows(NoSuchElementException.class, ()-> postSubCommentService.createPostSubComment(testBlogPost1.getId(),postSubCommentDto));
@@ -144,7 +144,7 @@ public class PostSubCommentServiceTest {
                 .build();
 
         when(postCommentRepository.findPostCommentWithPostSubCommentsById(any(Long.class))).thenReturn(Optional.of(testPostComment1));
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser2));
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(testUser2));
         when(postSubCommentRepository.save(any(PostSubComment.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when
@@ -183,7 +183,7 @@ public class PostSubCommentServiceTest {
                 .build();
 
         when(postCommentRepository.findPostCommentWithPostSubCommentsById(any(Long.class))).thenReturn(Optional.of(testPostComment1));
-        when(userRepository.findByEmail(any(String.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        when(userRepository.findById(any(Long.class))).thenThrow(new NoSuchElementException("해당 유저가 존재하지 않습니다."));
 
         //when
         //then

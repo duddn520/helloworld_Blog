@@ -62,7 +62,7 @@ public class BlogPostControllerTest {
 
         userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         System.out.println("############################################");
         BlogPostDto blogPostDto = BlogPostDto.builder()
@@ -126,7 +126,7 @@ public class BlogPostControllerTest {
 
         userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         System.out.println("########################");
 
@@ -160,7 +160,7 @@ public class BlogPostControllerTest {
 
         UserDto savedUser = userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         BlogPostDto blogPostDto1 = BlogPostDto.builder()
                 .content("newcontent1!!!!!!")
@@ -215,7 +215,7 @@ public class BlogPostControllerTest {
 
         UserDto savedUser = userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/blogpost/all")
@@ -236,7 +236,7 @@ public class BlogPostControllerTest {
                 .email("email@email.com")
                 .build();
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         User user = userDto.toEntity();
         userService.addUser(userDto);
@@ -269,7 +269,7 @@ public class BlogPostControllerTest {
                 .email("email@email.com")
                 .build();
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         User user = userDto.toEntity();
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",user.getAuthorities()));
@@ -293,7 +293,7 @@ public class BlogPostControllerTest {
                 .email("email@email.com")
                 .build();
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         User user = userDto.toEntity();
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",user.getAuthorities()));
@@ -341,7 +341,7 @@ public class BlogPostControllerTest {
                 .email("123@email.com")
                 .build();
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         User user = userDto.toEntity();
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",user.getAuthorities()));
@@ -390,7 +390,7 @@ public class BlogPostControllerTest {
 
         userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/blogpost")
@@ -412,7 +412,7 @@ public class BlogPostControllerTest {
                 .email("email@email.com")
                 .build();
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         User user = userDto.toEntity();
         userService.addUser(userDto);
@@ -455,7 +455,7 @@ public class BlogPostControllerTest {
 
         BlogPostDto savedDto  = blogPostService.addBlogPost(blogPostDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/blogpost")
@@ -481,7 +481,7 @@ public class BlogPostControllerTest {
 
         userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/blogpost")

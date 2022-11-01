@@ -61,7 +61,7 @@ public class GuestBookControllerTest {
         UserDto savedDto = userService.addUser(userDto);
         userService.addUser(callerDto);
 
-        String token = jwtTokenService.createToken("caller@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
                 .content("content")
@@ -129,7 +129,7 @@ public class GuestBookControllerTest {
 
         userService.addUser(callerDto);
 
-        String token = jwtTokenService.createToken("caller@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
                 .content("content")
@@ -245,7 +245,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         GuestBookCommentDto updateCommentDto = GuestBookCommentDto.builder()
                 .id(savedCommentDto.getId())
@@ -339,7 +339,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         GuestBookCommentDto updateCommentDto = GuestBookCommentDto.builder()
                 .id(savedCommentDto.getId())
@@ -387,7 +387,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/guestbook")
@@ -463,7 +463,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/guestbook")

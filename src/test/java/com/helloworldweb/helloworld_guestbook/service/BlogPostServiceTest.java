@@ -77,7 +77,7 @@ public class BlogPostServiceTest {
                 .profileUrl("profileimage")
                 .build();
 
-        when(userRepository.findUserWithBlogPostsByEmail(any(String.class))).thenReturn(Optional.of(user));
+        when(userRepository.findUserWithBlogPostsById(any(Long.class))).thenReturn(Optional.of(user));
         when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when

@@ -55,8 +55,8 @@ public class JwtTokenService {
         }
     }
 
-    public String createToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createToken(String Id) {
+        Claims claims = Jwts.claims().setSubject(Id);
 
         long now = (new Date()).getTime();
         Date validTime = new Date(now + TOKEN_VALID_TIME);
@@ -70,11 +70,11 @@ public class JwtTokenService {
     }
 
     public Authentication getAuthentication(String token){
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserEmail(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserId(token));
         return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
     }
 
-    public String getUserEmail(String token)
+    public String getUserId(String token)
     {
         return Jwts.parser().setSigningKey(key)
                 .parseClaimsJws(token).getBody().getSubject();

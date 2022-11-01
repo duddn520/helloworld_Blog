@@ -71,7 +71,7 @@ public class PostSubCommentControllerTest {
                 .build();
         String json = new ObjectMapper().writeValueAsString(postSubCommentDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/postsubcomment/new")
@@ -149,8 +149,8 @@ public class PostSubCommentControllerTest {
                 .build();
         String json = new ObjectMapper().writeValueAsString(postSubCommentDto);
 
-        String token = jwtTokenService.createToken("123@email.com");
-        //등록되지 않은 유저의 email을 담은 jwt 요청
+        String token = jwtTokenService.createToken(String.valueOf(2L));
+        //등록되지 않은 유저의 ID를 담은 jwt 요청
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/postsubcomment/new")
@@ -201,7 +201,7 @@ public class PostSubCommentControllerTest {
 
         String json = new ObjectMapper().writeValueAsString(addSubCommentDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/postsubcomment/new")
@@ -299,7 +299,7 @@ public class PostSubCommentControllerTest {
 
         String json = new ObjectMapper().writeValueAsString(addSubCommentDto);
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/postsubcomment/new")
@@ -511,7 +511,7 @@ public class PostSubCommentControllerTest {
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(updateDto);
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
@@ -607,7 +607,7 @@ public class PostSubCommentControllerTest {
                 .build();
         //쌩뚱맞은 PostSubCommentId
         String json = new ObjectMapper().writeValueAsString(updateDto);
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
@@ -656,7 +656,7 @@ public class PostSubCommentControllerTest {
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(updateDto);
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
@@ -697,7 +697,7 @@ public class PostSubCommentControllerTest {
         PostSubCommentDto savedSubCommentDto = postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto);
         //이미 등록된 댓글이 있는 상태.
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
@@ -774,7 +774,7 @@ public class PostSubCommentControllerTest {
 
         PostSubCommentDto savedSubCommentDto = postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto);
         //이미 등록된 댓글이 있는 상태.
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
@@ -814,7 +814,7 @@ public class PostSubCommentControllerTest {
         PostSubCommentDto savedSubCommentDto = postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto);
         //이미 등록된 댓글이 있는 상태.
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")

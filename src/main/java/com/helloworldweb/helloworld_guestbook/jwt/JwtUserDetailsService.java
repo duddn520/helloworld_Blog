@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
-    public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-        User user = User.builder().email(userEmail).build();
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        User user = User.builder().id(Long.valueOf(userId)).build();
         return user;
     }
 }

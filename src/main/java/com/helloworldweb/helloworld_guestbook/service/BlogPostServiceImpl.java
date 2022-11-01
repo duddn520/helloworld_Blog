@@ -27,8 +27,8 @@ public class BlogPostServiceImpl implements BlogPostService{
     @Override
     @Transactional
     public BlogPostDto addBlogPost(BlogPostDto blogPostDto) {
-        String callerEmail = getUserEmailFromSecurityContextHolder();
-        User writer = getUserWithBlogPostsByUserEmail(callerEmail);
+        Long callerId = getUserIdFromContextHolder();
+        User writer = getUserWithBlogPostsByUserId(callerId);
 
         BlogPost blogPost = blogPostDto.toEntity();
         blogPost.updateUser(writer);
@@ -62,9 +62,9 @@ public class BlogPostServiceImpl implements BlogPostService{
     @Transactional
     public BlogPostDto updateBlogPost(BlogPostDto blogPostDto){
 
-        String callerEmail = getUserEmailFromSecurityContextHolder();
+        Long callerId = getUserIdFromContextHolder();
         BlogPost blogPost = getBlogPostWithUserByID(blogPostDto.getId());
-        if(vaildateCaller(blogPost.getUser().getEmail(),callerEmail)){
+        if(vaildateCaller(blogPost.getUser().getId(),callerId)){
             blogPost.updateBlogPost(blogPostDto);
             return new BlogPostDto(blogPostRepository.save(blogPost)); // 갱신된 BlogPost객체 Dto화 하기위해 DirtyCheck 대신 직접 save
         }
@@ -77,9 +77,9 @@ public class BlogPostServiceImpl implements BlogPostService{
     @Override
     @Transactional
     public void deleteBlogPost(Long blogPostId){
-        String callerEmail = getUserEmailFromSecurityContextHolder();
+        Long callerId = getUserIdFromContextHolder();
         BlogPost blogPost = getBlogPostWithUserByID(blogPostId);
-        if(vaildateCaller(blogPost.getUser().getEmail(),callerEmail)){
+        if(vaildateCaller(blogPost.getUser().getId(),callerId)){
             blogPostRepository.delete(blogPost);
         }else{
             throw new IllegalCallerException("게시글 작성자만 삭제할 수 있습니다.");
@@ -90,30 +90,26 @@ public class BlogPostServiceImpl implements BlogPostService{
         return blogPostRepository.findBlogPostWithUserById(blogPostId).orElseThrow(()-> new NoSuchElementException("해당 포스트가 존재하지 않습니다."));
     }
 
-    private User getUserByEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-
-    }
-
     private List<BlogPost> getAllBlogPostsById(Long userId){
         return blogPostRepository.findAllBlogPostByUserId(userId).orElseGet(()->new ArrayList<>());
     }
 
-    private boolean vaildateCaller(String writerEmail, String callerEmail){
-        if (writerEmail.equals(callerEmail)){
+    private boolean vaildateCaller(Long writerId, Long callerId){
+        if (writerId.equals(callerId)){
             return true;
         }else{
             return false;
         }
     }
 
-    private String getUserEmailFromSecurityContextHolder() {
+    private Long getUserIdFromContextHolder() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user.getEmail();
+        return user.getId();
     }
 
-    private User getUserWithBlogPostsByUserEmail(String email){
-        return userRepository.findUserWithBlogPostsByEmail(email)
+    private User getUserWithBlogPostsByUserId(Long userId){
+        return userRepository.findUserWithBlogPostsById(userId)
                 .orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        // TODO: 2022/11/01 DB동기화오류 -> orElseGet 처리 필요.
     }
 }

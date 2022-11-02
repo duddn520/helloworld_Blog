@@ -44,17 +44,30 @@ public class Consumer {
     private UserDto messageToUserDto(String jsonString ){
         JsonParser jsonParser = new JsonParser();
         JsonElement element = jsonParser.parse(jsonString);
-        JsonObject json = element.getAsJsonObject();
+        JsonObject object = element.getAsJsonObject();
+
+        Long id = object.get("id").getAsLong();
+        String email = object.get("email").isJsonNull()? null : object.get("email").getAsString();
+        String socialAccountId = object.get("socialAccountId").isJsonNull()? null: object.get("socialAccountId").getAsString();
+        String nickName = object.get("nickName").isJsonNull()? null: object.get("nickName").getAsString();
+        String profileUrl = object.get("profileUrl").isJsonNull()?null:object.get("profileUrl").getAsString();
+        String repoUrl = object.get("repoUrl").isJsonNull()? null: object.get("repoUrl").getAsString();
+        String profileMusicName = object.get("profileMusicName").isJsonNull()? null: object.get("profileMusicName").getAsString();
+        String profileMusicUrl = object.get("profileMusicUrl").isJsonNull()? null: object.get("profileMusicUrl").getAsString();
+        String fcm = object.get("fcm").isJsonNull()? null : object.get("fcm").getAsString();
+
         UserDto userDto = UserDto.builder()
-                .id(json.get("id").getAsLong())
-                .email(json.get("email").getAsString())
-//                .profileUrl(json.get("profileUrl").getAsString())
-//                .nickName(json.get("nickName").getAsString())
-//                .repoUrl(json.get("repoUrl").getAsString())
-//                .profileMusicName(json.get("profileMusicName").getAsString())
-//                .profileMusicUrl(json.get("profileMusicUrl").getAsString())
-//                .fcm(json.get("fcm").getAsString())
+                .id(id)
+                .email(email)
+                .socialAccountId(socialAccountId)
+                .nickName(nickName)
+                .profileUrl(profileUrl)
+                .repoUrl(repoUrl)
+                .profileMusicUrl(profileMusicUrl)
+                .profileMusicName(profileMusicName)
+                .fcm(fcm)
                 .build();
+
         return userDto;
     }
 

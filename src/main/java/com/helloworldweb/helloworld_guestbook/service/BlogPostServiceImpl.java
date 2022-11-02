@@ -23,6 +23,7 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     private final UserRepository userRepository;
     private final BlogPostRepository blogPostRepository;
+    private final SyncService syncService;
 
     @Override
     @Transactional
@@ -109,7 +110,10 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     private User getUserWithBlogPostsByUserId(Long userId){
         return userRepository.findUserWithBlogPostsById(userId)
-                .orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+                .orElseGet(()-> syncService.syncUser(userId));
+        //User서버에 Sync요청을 보내고, 없으면 NosuchElementException, 있으면 User객체 반환
+
+//                .orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         // TODO: 2022/11/01 DB동기화오류 -> orElseGet 처리 필요.
     }
 }

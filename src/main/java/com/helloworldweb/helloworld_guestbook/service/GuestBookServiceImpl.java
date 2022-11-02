@@ -21,6 +21,7 @@ public class GuestBookServiceImpl implements GuestBookService{
 
     private final UserRepository userRepository;
     private final GuestBookCommentRepository guestBookCommentRepository;
+    private final SyncService syncService;
 
     @Override
     @Transactional
@@ -75,7 +76,9 @@ public class GuestBookServiceImpl implements GuestBookService{
     }
 
     private User getUserById(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        User user = userRepository.findById(userId)
+                .orElseGet(()-> syncService.syncUser(userId));
+//                .orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         return user;
         // TODO: 2022/11/01 유저 DB 동기화 안 된 경우, orElseGet처리 필요
 

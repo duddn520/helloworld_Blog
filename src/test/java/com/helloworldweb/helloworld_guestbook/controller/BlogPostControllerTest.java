@@ -5,10 +5,7 @@ import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.jwt.JwtTokenService;
-import com.helloworldweb.helloworld_guestbook.service.BlogPostService;
-import com.helloworldweb.helloworld_guestbook.service.GuestBookService;
-import com.helloworldweb.helloworld_guestbook.service.PostSubCommentService;
-import com.helloworldweb.helloworld_guestbook.service.UserService;
+import com.helloworldweb.helloworld_guestbook.service.*;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +48,10 @@ public class BlogPostControllerTest {
 
     @Autowired
     JwtTokenService jwtTokenService;
+
+    @Autowired
+    SyncService syncService;
+
 
     @Test
     void registerBlogPost_Success() throws Exception {
@@ -115,9 +116,10 @@ public class BlogPostControllerTest {
 
     }
 
+
     //kafka 오류시 처리방향(addUser)
     @Test
-    void registerBlogPost_Fail_NotExistingUser() throws Exception {
+    void registerBlogPost_Fail_NotExistingUser_SyncFailed() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
                 .id(1L)
@@ -126,7 +128,7 @@ public class BlogPostControllerTest {
 
         userService.addUser(userDto);
 
-        String token = jwtTokenService.createToken(String.valueOf(2L));
+        String token = jwtTokenService.createToken(String.valueOf(2000000000000000000L));
 
         System.out.println("########################");
 

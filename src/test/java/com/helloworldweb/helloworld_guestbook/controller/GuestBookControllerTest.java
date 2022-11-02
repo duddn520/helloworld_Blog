@@ -6,6 +6,7 @@ import com.helloworldweb.helloworld_guestbook.dto.GuestBookDto;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.jwt.JwtTokenService;
 import com.helloworldweb.helloworld_guestbook.service.GuestBookService;
+import com.helloworldweb.helloworld_guestbook.service.SyncService;
 import com.helloworldweb.helloworld_guestbook.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ public class GuestBookControllerTest {
 
     @Autowired
     JwtTokenService jwtTokenService;
+
+    @Autowired
+    SyncService syncService;
 
 
     @Test

@@ -7,6 +7,7 @@ import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.jwt.JwtTokenService;
 import com.helloworldweb.helloworld_guestbook.service.BlogPostService;
 import com.helloworldweb.helloworld_guestbook.service.PostSubCommentService;
+import com.helloworldweb.helloworld_guestbook.service.SyncService;
 import com.helloworldweb.helloworld_guestbook.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +46,9 @@ public class PostSubCommentControllerTest {
 
     @Autowired
     JwtTokenService jwtTokenService;
+
+    @Autowired
+    SyncService syncService;
 
     @Test
     void createPostSubComment_Success() throws Exception {

@@ -41,6 +41,7 @@ public class PostSubCommentController {
         }
     }
 
+    // TODO: 2022/11/05 postsubcomment 등록 절차 별도함수 -> 분기로 변경할것. 
     @PostMapping("/api/postsubcomment")
     private ResponseEntity<ApiResponse> addPostSubComment(@RequestParam(name = "postcomment_id")Long postCommentId,@RequestBody PostSubCommentDto postSubCommentDto)
     {

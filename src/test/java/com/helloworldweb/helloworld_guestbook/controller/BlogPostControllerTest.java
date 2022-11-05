@@ -118,39 +118,39 @@ public class BlogPostControllerTest {
 
 
     //kafka 오류시 처리방향(addUser)
-    @Test
-    void registerBlogPost_Fail_NotExistingUser_SyncFailed() throws Exception {
-        //given
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .email("email@email.com")
-                .build();
-
-        userService.addUser(userDto);
-
-        String token = jwtTokenService.createToken(String.valueOf(2000000000000000000L));
-
-        System.out.println("########################");
-
-        BlogPostDto blogPostDto = BlogPostDto.builder()
-                .content("newcontent1!!!!!!")
-                .title("title123123123123")
-                .build();
-
-        String json = new ObjectMapper().writeValueAsString(blogPostDto);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/blogpost")
-                .header("Auth",token)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON);
-        //when
-        mvc.perform(requestBuilder)
-        //then
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
-
-    }
+//    @Test
+//    void registerBlogPost_Fail_NotExistingUser_SyncFailed() throws Exception {
+//        //given
+//        UserDto userDto = UserDto.builder()
+//                .id(1L)
+//                .email("email@email.com")
+//                .build();
+//
+//        userService.addUser(userDto);
+//
+//        String token = jwtTokenService.createToken(String.valueOf(2000000000000000000L));
+//
+//        System.out.println("########################");
+//
+//        BlogPostDto blogPostDto = BlogPostDto.builder()
+//                .content("newcontent1!!!!!!")
+//                .title("title123123123123")
+//                .build();
+//
+//        String json = new ObjectMapper().writeValueAsString(blogPostDto);
+//
+//        RequestBuilder requestBuilder = MockMvcRequestBuilders
+//                .post("/api/blogpost")
+//                .header("Auth",token)
+//                .content(json)
+//                .contentType(MediaType.APPLICATION_JSON);
+//        //when
+//        mvc.perform(requestBuilder)
+//        //then
+//                .andExpect(status().is4xxClientError())
+//                .andDo(print());
+//
+//    }
 
     @Test
     void getAllBlogPostsByUserId_Success() throws Exception {

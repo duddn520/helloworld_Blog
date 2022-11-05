@@ -1,6 +1,7 @@
 package com.helloworldweb.helloworld_guestbook.service;
 
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -23,9 +24,10 @@ public interface BlogPostService {
     /** R
      * getAllBlogPosts - 유저 이메일을 통해 해당 유저가 작성한 모든 BLOGPOST 객체를 반환하는 함수.
      * @param userId - BLOGPOST를 작성한 User의 Email
+     * @param pageable - Pagination을 위한 Pageable 객체
      * @return BLOGPOST 정보가 담긴 BLOGPOSTDTO의 LIST
      */
-    List<BlogPostDto> getAllBlogPosts(Long userId);
+    List<BlogPostDto> getAllBlogPosts(Long userId, Pageable pageable);
 
     /** U
      * updateBlogPost - BLOGPOST 정보를 받고, 기존 BLOGPOST객체를 UPDATE하는 함수.

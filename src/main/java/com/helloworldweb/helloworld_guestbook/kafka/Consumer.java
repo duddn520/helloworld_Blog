@@ -51,10 +51,10 @@ public class Consumer {
         String socialAccountId = object.get("socialAccountId").isJsonNull()? null: object.get("socialAccountId").getAsString();
         String nickName = object.get("nickName").isJsonNull()? null: object.get("nickName").getAsString();
         String profileUrl = object.get("profileUrl").isJsonNull()?null:object.get("profileUrl").getAsString();
-        String repoUrl = object.get("repoUrl").isJsonNull()? null: object.get("repoUrl").getAsString();
-        String profileMusicName = object.get("profileMusicName").isJsonNull()? null: object.get("profileMusicName").getAsString();
-        String profileMusicUrl = object.get("profileMusicUrl").isJsonNull()? null: object.get("profileMusicUrl").getAsString();
-        String fcm = object.get("fcm").isJsonNull()? null : object.get("fcm").getAsString();
+//        String repoUrl = object.get("repoUrl").isJsonNull()? null: object.get("repoUrl").getAsString();
+//        String profileMusicName = object.get("profileMusicName").isJsonNull()? null: object.get("profileMusicName").getAsString();
+//        String profileMusicUrl = object.get("profileMusicUrl").isJsonNull()? null: object.get("profileMusicUrl").getAsString();
+//        String fcm = object.get("fcm").isJsonNull()? null : object.get("fcm").getAsString();
 
         UserDto userDto = UserDto.builder()
                 .id(id)
@@ -62,10 +62,10 @@ public class Consumer {
                 .socialAccountId(socialAccountId)
                 .nickName(nickName)
                 .profileUrl(profileUrl)
-                .repoUrl(repoUrl)
-                .profileMusicUrl(profileMusicUrl)
-                .profileMusicName(profileMusicName)
-                .fcm(fcm)
+//                .repoUrl(repoUrl)
+//                .profileMusicUrl(profileMusicUrl)
+//                .profileMusicName(profileMusicName)
+//                .fcm(fcm)
                 .build();
 
         return userDto;

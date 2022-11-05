@@ -1,6 +1,8 @@
 package com.helloworldweb.helloworld_guestbook.repository;
 
 import com.helloworldweb.helloworld_guestbook.domain.BlogPost;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +17,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPost,Long> {
     Optional<BlogPost> findBlogPostWithUserById(@Param(value = "blogPostId") Long blogPostId);
 
     @Query(value = "select b from BlogPost b join fetch b.user u where u.id = :userId")
-    Optional<List<BlogPost>> findAllBlogPostByUserId(@Param(value = "userId")Long userId);
+    Optional<List<BlogPost>> findAllBlogPostByUserId(@Param(value = "userId")Long userId, Pageable pageable);
 
 }

@@ -8,6 +8,8 @@ import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.repository.BlogPostRepository;
 import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,9 +50,9 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     //댓글이나 대댓글, 작성자를 표시할 필요 없어 지연로딩 관련 서비스 불필요.
-    public List<BlogPostDto> getAllBlogPosts(Long userId) {
+    public List<BlogPostDto> getAllBlogPosts(Long userId, Pageable pageable) {
 
-        List<BlogPost> blogPosts = getAllBlogPostsById(userId);
+        List<BlogPost> blogPosts = getAllBlogPostsPageById(userId,pageable);
 
         List<BlogPostDto> blogPostDtos = blogPosts.stream().map((b)->new BlogPostDto(b)).collect(Collectors.toList());
 
@@ -91,8 +93,8 @@ public class BlogPostServiceImpl implements BlogPostService{
         return blogPostRepository.findBlogPostWithUserById(blogPostId).orElseThrow(()-> new NoSuchElementException("해당 포스트가 존재하지 않습니다."));
     }
 
-    private List<BlogPost> getAllBlogPostsById(Long userId){
-        return blogPostRepository.findAllBlogPostByUserId(userId).orElseGet(()->new ArrayList<>());
+    private List<BlogPost> getAllBlogPostsPageById(Long userId, Pageable pageable){
+        return blogPostRepository.findAllBlogPostByUserId(userId,pageable).orElseGet(()->new ArrayList<>());
     }
 
     private boolean vaildateCaller(Long writerId, Long callerId){

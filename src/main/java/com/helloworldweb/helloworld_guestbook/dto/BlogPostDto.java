@@ -4,6 +4,7 @@ import com.helloworldweb.helloworld_guestbook.domain.BlogPost;
 import com.helloworldweb.helloworld_guestbook.domain.PostComment;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Getter
+@Data
 public class BlogPostDto {
     private Long id;
     private String title;

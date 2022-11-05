@@ -96,9 +96,10 @@ public class GuestBookServiceImpl implements GuestBookService{
         }
     }
 
+    // TODO: 2022/11/05 추가적으로 user동기화필요한부분 동기화해줄것.
     private User getUserWithGuestBookWithGuestBookCommentById(Long userId){
-        User user = userRepository.findUserWithGuestBookWithGuestBookCommentsbyId(userId).orElseThrow
-                (()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        User user = userRepository.findUserWithGuestBookWithGuestBookCommentsbyId(userId)
+                .orElseGet(()-> syncService.syncUser(userId));
         return user;
     }
 

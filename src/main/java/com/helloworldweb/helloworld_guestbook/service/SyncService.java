@@ -27,7 +27,7 @@ public class SyncService {
     public User syncUser(Long userId) {
         String token = jwtTokenService.createToken(String.valueOf(userId));
         WebClient webClient = WebClient.builder()
-                .baseUrl("http://localhost:8000")
+                .baseUrl("http://localhost:8080")
                 .defaultHeader("Auth",token)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();

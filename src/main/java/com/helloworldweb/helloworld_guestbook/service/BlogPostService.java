@@ -44,4 +44,11 @@ public interface BlogPostService {
      */
     void deleteBlogPost(Long blogPostId);
 
+    /**
+     * pagination을 위한 전체 페이지 조회 메서드
+     * @param userId - 특정 유저의 id(블로그 작성자)
+     * @param pageable - pageable 조건 객체
+     * @return - 해당 유저가 작성한 블로그 게시글의 총 페이지갯수.
+     */
+    int getTotalPages(Long userId, Pageable pageable);
 }

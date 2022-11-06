@@ -78,7 +78,7 @@ public class PostSubCommentControllerTest {
         String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/postsubcomment/new")
+                .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
                 .header("Auth",token)
@@ -208,7 +208,7 @@ public class PostSubCommentControllerTest {
         String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/postsubcomment/new")
+                .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
                 .header("Auth",token)
@@ -437,49 +437,49 @@ public class PostSubCommentControllerTest {
 
     }
 
-    @Test
-    void getAllPostSubCommentsById_Fail_NotFoundUser() throws Exception {
-        //given
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .email("email@email.com")
-                .build();
-
-        UserDto savedUserDto = userService.addUser(userDto);
-
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",userDto.toEntity().getAuthorities()));
-
-        BlogPostDto blogPostDto = BlogPostDto.builder()
-                .content("content")
-                .title("title")
-                .build();
-
-        BlogPostDto savedBlogPostDto = blogPostService.addBlogPost(blogPostDto);
-
-        PostSubCommentDto postSubCommentDto1 = PostSubCommentDto.builder()
-                .content("subcomment1!!!!!")
-                .build();
-
-        PostSubCommentDto postSubCommentDto2 = PostSubCommentDto.builder()
-                .content("subcomment2!!!!!")
-                .build();
-
-        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto1);
-        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto2);
-        //이미 등록된 댓글이 있는 상태.
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/api/postsubcomment/user")
-                .param("user_id",String.valueOf(999L));
-        //쌩뚱맞은 파라미터
-
-        //when
-        mvc.perform(requestBuilder)
-                //then
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
-
-    }
+//    @Test
+//    void getAllPostSubCommentsById_Fail_NotFoundUser() throws Exception {
+//        //given
+//        UserDto userDto = UserDto.builder()
+//                .id(1L)
+//                .email("email@email.com")
+//                .build();
+//
+//        UserDto savedUserDto = userService.addUser(userDto);
+//
+//        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",userDto.toEntity().getAuthorities()));
+//
+//        BlogPostDto blogPostDto = BlogPostDto.builder()
+//                .content("content")
+//                .title("title")
+//                .build();
+//
+//        BlogPostDto savedBlogPostDto = blogPostService.addBlogPost(blogPostDto);
+//
+//        PostSubCommentDto postSubCommentDto1 = PostSubCommentDto.builder()
+//                .content("subcomment1!!!!!")
+//                .build();
+//
+//        PostSubCommentDto postSubCommentDto2 = PostSubCommentDto.builder()
+//                .content("subcomment2!!!!!")
+//                .build();
+//
+//        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto1);
+//        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto2);
+//        //이미 등록된 댓글이 있는 상태.
+//
+//        RequestBuilder requestBuilder = MockMvcRequestBuilders
+//                .get("/api/postsubcomment/user")
+//                .param("user_id",String.valueOf(999L));
+//        //쌩뚱맞은 파라미터
+//
+//        //when
+//        mvc.perform(requestBuilder)
+//                //then
+//                .andExpect(status().is4xxClientError())
+//                .andDo(print());
+//
+//    }
 
     @Test
     void updatePostSubComment_Success() throws Exception {

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,6 +88,12 @@ public class BlogPostServiceImpl implements BlogPostService{
         }else{
             throw new IllegalCallerException("게시글 작성자만 삭제할 수 있습니다.");
         }
+    }
+
+    @Override
+    public int getTotalPages(Long userId, Pageable pageable) {
+        Page<BlogPost> blogPostPage = blogPostRepository.findAllByUserId(userId,pageable);
+        return blogPostPage.getTotalPages();
     }
 
     private BlogPost getBlogPostWithUserByID(Long blogPostId){

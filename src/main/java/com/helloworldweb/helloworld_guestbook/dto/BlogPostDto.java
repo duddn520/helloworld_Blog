@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +24,8 @@ public class BlogPostDto {
     private Long searchCount ;
     private Long views;
     private UserDto userDto;
+    private LocalDateTime createdTime;
+    private LocalDateTime modifiedTime;
     private List<PostCommentDto> postCommentDtos = new ArrayList<>();
 
     public BlogPostDto(BlogPost blogPost){
@@ -32,6 +35,8 @@ public class BlogPostDto {
         this.tags = blogPost.getTags();
         this.searchCount = blogPost.getSearchCount();
         this.views = blogPost.getViews();
+        this.createdTime = blogPost.getCreatedTime();
+        this.modifiedTime = blogPost.getModifiedTime();
         this.userDto = new UserDto(blogPost.getUser());
     }
 
@@ -42,6 +47,8 @@ public class BlogPostDto {
         this.tags = blogPost.getTags();
         this.searchCount = blogPost.getSearchCount();
         this.views = blogPost.getViews();
+        this.createdTime = blogPost.getCreatedTime();
+        this.modifiedTime = blogPost.getModifiedTime();
         this.userDto = new UserDto(blogPost.getUser());
         this.postCommentDtos = postComments.stream().map((p)->new PostCommentDto(p)).collect(Collectors.toList());
     }

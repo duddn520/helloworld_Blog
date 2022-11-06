@@ -20,48 +20,46 @@ public class PostSubCommentController {
 
     private final PostSubCommentService postSubCommentService;
 
-    @PostMapping("/api/postsubcomment/new")
-    private ResponseEntity<ApiResponse> createPostSubComment(@RequestParam(name = "blogpost_id")Long blogPostId, @RequestBody PostSubCommentDto postSubCommentDto)
-    {
-        try{
-            PostSubCommentDto savedDto = postSubCommentService.createPostSubComment(blogPostId,postSubCommentDto);
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.POST_SUCCESS,
-                    savedDto), HttpStatus.OK);
-        }catch (ClassCastException e ){
-            //jwt가 존재하지 않을 떄, Authentication 객체가 ContextHolder에 등록되지 않아 (User) 캐스팅 실패하여 예외 발생.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-        }catch (NoSuchElementException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NOT_FOUND_USER), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    // TODO: 2022/11/05 postsubcomment 등록 절차 별도함수 -> 분기로 변경할것. 
     @PostMapping("/api/postsubcomment")
-    private ResponseEntity<ApiResponse> addPostSubComment(@RequestParam(name = "postcomment_id")Long postCommentId,@RequestBody PostSubCommentDto postSubCommentDto)
+    private ResponseEntity<ApiResponse> createPostSubComment(@RequestParam(name = "blogpost_id", required = false) Long blogPostId, @RequestBody PostSubCommentDto postSubCommentDto)
     {
-        try{
-            PostSubCommentDto savedDto = postSubCommentService.addPostSubComment(postSubCommentDto);
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.POST_SUCCESS,
-                    savedDto), HttpStatus.OK);
-        }catch (ClassCastException e)
-        {
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-        }catch (NoSuchElementException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NOT_FOUND_USER), HttpStatus.UNAUTHORIZED);
-        }
+        if (blogPostId != null){
+            try{
+                PostSubCommentDto savedDto = postSubCommentService.createPostSubComment(blogPostId,postSubCommentDto);
+                return new ResponseEntity<>(ApiResponse.response(
+                        HttpStatusCode.OK,
+                        HttpResponseMsg.POST_SUCCESS,
+                        savedDto), HttpStatus.OK);
+            }catch (ClassCastException e ){
+                //jwt가 존재하지 않을 떄, Authentication 객체가 ContextHolder에 등록되지 않아 (User) 캐스팅 실패하여 예외 발생.
+                return new ResponseEntity<>(ApiResponse.response(
+                        HttpStatusCode.UNAUTHORIZED,
+                        HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
+            }catch (NoSuchElementException e){
+                return new ResponseEntity<>(ApiResponse.response(
+                        HttpStatusCode.UNAUTHORIZED,
+                        HttpResponseMsg.NOT_FOUND_USER), HttpStatus.UNAUTHORIZED);
+            }
 
+        }else
+        {
+            try{
+                PostSubCommentDto savedDto = postSubCommentService.addPostSubComment(postSubCommentDto);
+                return new ResponseEntity<>(ApiResponse.response(
+                        HttpStatusCode.OK,
+                        HttpResponseMsg.POST_SUCCESS,
+                        savedDto), HttpStatus.OK);
+            }catch (ClassCastException e)
+            {
+                return new ResponseEntity<>(ApiResponse.response(
+                        HttpStatusCode.UNAUTHORIZED,
+                        HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
+            }catch (NoSuchElementException e){
+                return new ResponseEntity<>(ApiResponse.response(
+                        HttpStatusCode.UNAUTHORIZED,
+                        HttpResponseMsg.NOT_FOUND_USER), HttpStatus.UNAUTHORIZED);
+            }
+        }
 
     }
 

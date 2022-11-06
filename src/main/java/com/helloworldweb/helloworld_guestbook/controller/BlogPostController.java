@@ -1,12 +1,14 @@
 package com.helloworldweb.helloworld_guestbook.controller;
 
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
+import com.helloworldweb.helloworld_guestbook.dto.BlogPostPageDto;
 import com.helloworldweb.helloworld_guestbook.model.ApiResponse;
 import com.helloworldweb.helloworld_guestbook.model.HttpResponseMsg;
 import com.helloworldweb.helloworld_guestbook.model.HttpStatusCode;
 import com.helloworldweb.helloworld_guestbook.service.BlogPostService;
 import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -55,11 +57,12 @@ public class BlogPostController {
     private ResponseEntity<ApiResponse> getAllBlogPostsByUserId(@RequestParam(name = "user_id") Long userId,
                                                                 @PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
 
+        int pageNum = blogPostService.getTotalPages(userId, pageable);
         List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(userId, pageable);
-
+        BlogPostPageDto blogPostPageDto = new BlogPostPageDto(blogPostDtos,pageNum);
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
-                HttpResponseMsg.GET_SUCCESS, blogPostDtos), HttpStatus.OK);
+                HttpResponseMsg.GET_SUCCESS, blogPostPageDto), HttpStatus.OK);
 
     }
 

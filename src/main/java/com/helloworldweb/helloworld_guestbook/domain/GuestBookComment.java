@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class GuestBookComment {
+public class GuestBookComment extends BaseEntity {
 
     @Id @GeneratedValue
     private Long id;
@@ -49,10 +49,9 @@ public class GuestBookComment {
         user.getGuestBookComments().add(this);
     }
 
+    // GuestBookComment에 댓글달기
     public GuestBookComment updateGuestBookComment(GuestBookCommentDto guestBookCommentDto){
-        this.content = guestBookCommentDto.getContent();
         this.reply = guestBookCommentDto.getReply();
-
         return this;
     }
 }

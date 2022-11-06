@@ -11,7 +11,8 @@ public interface PostSubCommentService {
      * @param postSubCommentDto - 댓글 내용을 가진 Dto, PostSubCommentDto
      * @return 작성 성공한 PostSubComment의 Dto
      */
-    PostSubCommentDto createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto);
+    PostSubCommentDto
+    createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto);
 
     /**
      * addPostSubComment - 이미 존재하는 PostComment에 댓글 추가, 기존 존재하는 PostComment 객체 찾고, User연관.

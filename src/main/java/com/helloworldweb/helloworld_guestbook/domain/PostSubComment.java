@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class PostSubComment {
+public class PostSubComment extends BaseEntity {
     @Id
     @GeneratedValue
     private Long id;

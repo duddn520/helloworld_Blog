@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
-public class BlogPost {
+public class BlogPost extends BaseEntity{
     @Id
     @GeneratedValue
     private Long id;

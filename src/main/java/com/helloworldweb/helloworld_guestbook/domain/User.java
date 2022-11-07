@@ -18,11 +18,12 @@ import java.util.List;
 @Getter
 public class User implements UserDetails {
 
-    @Id @GeneratedValue
+    @Id
     private Long id;
 
     @NotNull
     private String email;
+    private String socailAccountId;
     private String profileUrl;
     private String nickName;
     private String repoUrl;
@@ -44,10 +45,11 @@ public class User implements UserDetails {
     private List<PostSubComment> postSubComments = new ArrayList<>();
 
     @Builder
-    public User (Long id, String email, String profileUrl, String nickName,String repoUrl, String profileMusicName, String profileMusicUrl, String fcm,
+    public User (Long id, String email,String socailAccountId, String profileUrl, String nickName,String repoUrl, String profileMusicName, String profileMusicUrl, String fcm,
                  List<BlogPost> blogPosts, GuestBook guestBook, List<GuestBookComment> guestBookComments, List<PostSubComment> postSubComments){
         this.id = id;
         this.email = email;
+        this.socailAccountId = socailAccountId;
         this.profileUrl = profileUrl;
         this.nickName = nickName;
         this.repoUrl = repoUrl;
@@ -66,6 +68,7 @@ public class User implements UserDetails {
     }
 
     public void updateUser(UserDto userDto) {
+        this.socailAccountId = userDto.getSocialAccountId();
         this.profileUrl = userDto.getProfileUrl();
         this.nickName = userDto.getNickName();
         this.repoUrl = userDto.getRepoUrl();

@@ -12,6 +12,8 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -77,7 +79,7 @@ public class BlogPostServiceTest {
                 .profileUrl("profileimage")
                 .build();
 
-        when(userRepository.findUserWithBlogPostsByEmail(any(String.class))).thenReturn(Optional.of(user));
+        when(userRepository.findUserWithBlogPostsById(any(Long.class))).thenReturn(Optional.of(user));
         when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when
@@ -278,10 +280,13 @@ public class BlogPostServiceTest {
         blogPosts.add(blogPost1);
         blogPosts.add(blogPost2);
         blogPosts.add(blogPost3);
-        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class))).thenReturn(Optional.of(blogPosts));
+
+        Pageable pageable = PageRequest.of(0,10);
+
+        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class), any(Pageable.class))).thenReturn(Optional.of(blogPosts));
 
         //when
-        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(2L);
+        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(2L, pageable);
 
         //then
         /**
@@ -328,13 +333,14 @@ public class BlogPostServiceTest {
         blogPost1.updateUser(user);
         blogPost2.updateUser(user);
         blogPost3.updateUser(user);
+        Pageable pageable = PageRequest.of(0,10);
 
         //when
         //
-        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class))).thenThrow(new NoSuchElementException());
+        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class), any(Pageable.class))).thenThrow(new NoSuchElementException());
 
         //then
-        assertThrows(NoSuchElementException.class,()->blogPostService.getAllBlogPosts(0L));
+        assertThrows(NoSuchElementException.class,()->blogPostService.getAllBlogPosts(0L, pageable));
 
     }
 
@@ -347,9 +353,11 @@ public class BlogPostServiceTest {
                 .nickName("nickname")
                 .profileUrl("profileimage")
                 .build();
-        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class))).thenReturn(Optional.of(new ArrayList<>()));
+        Pageable pageable = PageRequest.of(0,10);
+
+        when(blogPostRepository.findAllBlogPostByUserId(any(Long.class), any(Pageable.class))).thenReturn(Optional.of(new ArrayList<>()));
         //when
-        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(2L);
+        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(2L,pageable);
 
         //then
         assertThat(blogPostDtos.size()).isEqualTo(0);

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class UserDto {
     private Long id;
     private String email;
+    private String socialAccountId;
     private String profileUrl;
     private String nickName;
     private String repoUrl;
@@ -21,6 +22,7 @@ public class UserDto {
     {
         this.id = user.getId();
         this.email = user.getEmail();
+        this.socialAccountId = user.getSocailAccountId();
         this.profileUrl = user.getProfileUrl();
         this.nickName = user.getNickName();
         this.repoUrl = user.getRepoUrl();
@@ -30,9 +32,10 @@ public class UserDto {
     }
 
     @Builder
-    public UserDto(Long id, String email, String profileUrl, String nickName, String repoUrl, String profileMusicUrl, String profileMusicName, String fcm){
+    public UserDto(Long id, String email,String socialAccountId, String profileUrl, String nickName, String repoUrl, String profileMusicUrl, String profileMusicName, String fcm){
         this.id = id;
         this.email = email;
+        this.socialAccountId = socialAccountId;
         this.profileUrl = profileUrl;
         this.nickName = nickName;
         this.repoUrl = repoUrl;
@@ -45,6 +48,7 @@ public class UserDto {
         return User.builder()
                 .id(this.id)
                 .email(this.email)
+                .socailAccountId(this.socialAccountId)
                 .nickName(this.nickName)
                 .profileUrl(this.profileUrl)
                 .repoUrl(this.repoUrl)

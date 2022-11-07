@@ -21,12 +21,13 @@ public class GuestBookServiceImpl implements GuestBookService{
 
     private final UserRepository userRepository;
     private final GuestBookCommentRepository guestBookCommentRepository;
+    private final SyncService syncService;
 
     @Override
     @Transactional
     public GuestBookDto addGuestBookComment(Long userId, GuestBookCommentDto guestBookCommentDto) {
-        String callerEmail = getCallerEmailFromSecurityContextHolder();
-        User caller = getUserByEmail(callerEmail);
+        Long callerId = getCallerIdFromSecurityContextHolder();
+        User caller = getUserById(callerId);
 
         User owner = getUserWithGuestBookWithGuestBookCommentById(userId);
         GuestBook guestBook = owner.getGuestBook();
@@ -52,9 +53,9 @@ public class GuestBookServiceImpl implements GuestBookService{
     @Override
     @Transactional
     public GuestBookCommentDto updateGuestBookComment(GuestBookCommentDto guestBookCommentDto) {
-        String callerEmail = getCallerEmailFromSecurityContextHolder();
+        Long callerId = getCallerIdFromSecurityContextHolder();
         GuestBookComment guestBookComment = getGuestBookCommentWithUserById(guestBookCommentDto.getId());
-        if (validateCaller(guestBookComment.getUser().getEmail(),callerEmail)) {
+        if (validateCaller(guestBookComment.getUser().getId(),callerId)) {
             return new GuestBookCommentDto(guestBookComment.updateGuestBookComment(guestBookCommentDto));
         }else{
             throw new IllegalCallerException("방명록 작성자만 수정할 수 있습니다.");
@@ -64,9 +65,9 @@ public class GuestBookServiceImpl implements GuestBookService{
     @Override
     @Transactional
     public void deleteGuestBookComment(Long guestBookCommentId) {
-        String callerEmail = getCallerEmailFromSecurityContextHolder();
+        Long callerId = getCallerIdFromSecurityContextHolder();
         GuestBookComment guestBookComment = getGuestBookCommentWithUserById(guestBookCommentId);
-        if(validateCaller(guestBookComment.getUser().getEmail(),callerEmail)) {
+        if(validateCaller(guestBookComment.getUser().getId(),callerId)) {
             guestBookCommentRepository.delete(guestBookComment);
         }else{
             throw new IllegalCallerException("방명록 작성자만 삭제할 수 있습니다.");
@@ -74,26 +75,31 @@ public class GuestBookServiceImpl implements GuestBookService{
         }
     }
 
-    private User getUserByEmail(String email){
-        User user = userRepository.findByEmail(email).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+    private User getUserById(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseGet(()-> syncService.syncUser(userId));
+//                .orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
         return user;
+        // TODO: 2022/11/01 유저 DB 동기화 안 된 경우, orElseGet처리 필요
+
     }
 
     private GuestBookComment getGuestBookCommentWithUserById(Long guestBookCommendId){
         return guestBookCommentRepository.findGuestBookCommentWithUserById(guestBookCommendId).orElseThrow(()-> new NoSuchElementException("해당 방명록이 존재하지 않습니다."));
     }
 
-    private boolean validateCaller(String email, String callerEmail){
-        if(email.equals(callerEmail)){
+    private boolean validateCaller(Long writerId, Long callerId){
+        if(writerId.equals(callerId)){
             return true;
         }else{
             return false;
         }
     }
 
+    // TODO: 2022/11/05 추가적으로 user동기화필요한부분 동기화해줄것.
     private User getUserWithGuestBookWithGuestBookCommentById(Long userId){
-        User user = userRepository.findUserWithGuestBookWithGuestBookCommentsbyId(userId).orElseThrow
-                (()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        User user = userRepository.findUserWithGuestBookWithGuestBookCommentsbyId(userId)
+                .orElseGet(()-> syncService.syncUser(userId));
         return user;
     }
 
@@ -102,8 +108,8 @@ public class GuestBookServiceImpl implements GuestBookService{
         return user;
     }
 
-    private String getCallerEmailFromSecurityContextHolder(){
+    private Long getCallerIdFromSecurityContextHolder(){
         User caller = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return caller.getEmail();
+        return caller.getId();
     }
 }

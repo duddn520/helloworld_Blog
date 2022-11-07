@@ -7,6 +7,7 @@ import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.jwt.JwtTokenService;
 import com.helloworldweb.helloworld_guestbook.service.BlogPostService;
 import com.helloworldweb.helloworld_guestbook.service.PostSubCommentService;
+import com.helloworldweb.helloworld_guestbook.service.SyncService;
 import com.helloworldweb.helloworld_guestbook.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -46,11 +47,15 @@ public class PostSubCommentControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
+    @Autowired
+    SyncService syncService;
+
     @Test
     void createPostSubComment_Success() throws Exception {
         //given
         //user 회원가입 및 blogPost 작성.
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -70,10 +75,10 @@ public class PostSubCommentControllerTest {
                 .build();
         String json = new ObjectMapper().writeValueAsString(postSubCommentDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/postsubcomment/new")
+                .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
                 .header("Auth",token)
@@ -90,6 +95,7 @@ public class PostSubCommentControllerTest {
     void createPostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -127,6 +133,7 @@ public class PostSubCommentControllerTest {
         //given
         //user 회원가입 및 blogPost 작성.
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -146,8 +153,8 @@ public class PostSubCommentControllerTest {
                 .build();
         String json = new ObjectMapper().writeValueAsString(postSubCommentDto);
 
-        String token = jwtTokenService.createToken("123@email.com");
-        //등록되지 않은 유저의 email을 담은 jwt 요청
+        String token = jwtTokenService.createToken(String.valueOf(2L));
+        //등록되지 않은 유저의 ID를 담은 jwt 요청
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/postsubcomment/new")
@@ -168,6 +175,7 @@ public class PostSubCommentControllerTest {
     void addPostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -197,10 +205,10 @@ public class PostSubCommentControllerTest {
 
         String json = new ObjectMapper().writeValueAsString(addSubCommentDto);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/postsubcomment/new")
+                .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
                 .header("Auth",token)
@@ -217,6 +225,7 @@ public class PostSubCommentControllerTest {
     void addPostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -264,6 +273,7 @@ public class PostSubCommentControllerTest {
     void addPostSubComment_Fail_NotFoundUser() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -293,7 +303,7 @@ public class PostSubCommentControllerTest {
 
         String json = new ObjectMapper().writeValueAsString(addSubCommentDto);
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/postsubcomment/new")
@@ -313,6 +323,7 @@ public class PostSubCommentControllerTest {
     void getPostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -349,6 +360,7 @@ public class PostSubCommentControllerTest {
     void getPostSubComment_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -386,6 +398,7 @@ public class PostSubCommentControllerTest {
     void getAllPostSubCommentsById_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -424,53 +437,55 @@ public class PostSubCommentControllerTest {
 
     }
 
-    @Test
-    void getAllPostSubCommentsById_Fail_NotFoundUser() throws Exception {
-        //given
-        UserDto userDto = UserDto.builder()
-                .email("email@email.com")
-                .build();
-
-        UserDto savedUserDto = userService.addUser(userDto);
-
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",userDto.toEntity().getAuthorities()));
-
-        BlogPostDto blogPostDto = BlogPostDto.builder()
-                .content("content")
-                .title("title")
-                .build();
-
-        BlogPostDto savedBlogPostDto = blogPostService.addBlogPost(blogPostDto);
-
-        PostSubCommentDto postSubCommentDto1 = PostSubCommentDto.builder()
-                .content("subcomment1!!!!!")
-                .build();
-
-        PostSubCommentDto postSubCommentDto2 = PostSubCommentDto.builder()
-                .content("subcomment2!!!!!")
-                .build();
-
-        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto1);
-        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto2);
-        //이미 등록된 댓글이 있는 상태.
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/api/postsubcomment/user")
-                .param("user_id",String.valueOf(999L));
-        //쌩뚱맞은 파라미터
-
-        //when
-        mvc.perform(requestBuilder)
-                //then
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
-
-    }
+//    @Test
+//    void getAllPostSubCommentsById_Fail_NotFoundUser() throws Exception {
+//        //given
+//        UserDto userDto = UserDto.builder()
+//                .id(1L)
+//                .email("email@email.com")
+//                .build();
+//
+//        UserDto savedUserDto = userService.addUser(userDto);
+//
+//        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",userDto.toEntity().getAuthorities()));
+//
+//        BlogPostDto blogPostDto = BlogPostDto.builder()
+//                .content("content")
+//                .title("title")
+//                .build();
+//
+//        BlogPostDto savedBlogPostDto = blogPostService.addBlogPost(blogPostDto);
+//
+//        PostSubCommentDto postSubCommentDto1 = PostSubCommentDto.builder()
+//                .content("subcomment1!!!!!")
+//                .build();
+//
+//        PostSubCommentDto postSubCommentDto2 = PostSubCommentDto.builder()
+//                .content("subcomment2!!!!!")
+//                .build();
+//
+//        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto1);
+//        postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto2);
+//        //이미 등록된 댓글이 있는 상태.
+//
+//        RequestBuilder requestBuilder = MockMvcRequestBuilders
+//                .get("/api/postsubcomment/user")
+//                .param("user_id",String.valueOf(999L));
+//        //쌩뚱맞은 파라미터
+//
+//        //when
+//        mvc.perform(requestBuilder)
+//                //then
+//                .andExpect(status().is4xxClientError())
+//                .andDo(print());
+//
+//    }
 
     @Test
     void updatePostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -500,7 +515,7 @@ public class PostSubCommentControllerTest {
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(updateDto);
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
@@ -519,6 +534,7 @@ public class PostSubCommentControllerTest {
     void updatePostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -566,6 +582,7 @@ public class PostSubCommentControllerTest {
     void updatePostSubComment_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -594,7 +611,7 @@ public class PostSubCommentControllerTest {
                 .build();
         //쌩뚱맞은 PostSubCommentId
         String json = new ObjectMapper().writeValueAsString(updateDto);
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
@@ -613,6 +630,7 @@ public class PostSubCommentControllerTest {
     void updatePostSubComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -642,7 +660,7 @@ public class PostSubCommentControllerTest {
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(updateDto);
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
@@ -661,6 +679,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -682,7 +701,7 @@ public class PostSubCommentControllerTest {
         PostSubCommentDto savedSubCommentDto = postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto);
         //이미 등록된 댓글이 있는 상태.
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
@@ -701,6 +720,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Fail_NoJWT() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -737,6 +757,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Fail_NoContent() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -757,7 +778,7 @@ public class PostSubCommentControllerTest {
 
         PostSubCommentDto savedSubCommentDto = postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto);
         //이미 등록된 댓글이 있는 상태.
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
@@ -775,6 +796,7 @@ public class PostSubCommentControllerTest {
     void deletePostSubComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
@@ -796,7 +818,7 @@ public class PostSubCommentControllerTest {
         PostSubCommentDto savedSubCommentDto = postSubCommentService.createPostSubComment(savedBlogPostDto.getId(),postSubCommentDto);
         //이미 등록된 댓글이 있는 상태.
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")

@@ -27,16 +27,17 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     private final UserRepository userRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostSubCommentRepository postSubCommentRepository;
+    private final SyncService syncService;
 
     @Override
     @Transactional
     //첫번째 댓글 작성.(존재하지 않는 PostComment)
     public PostSubCommentDto createPostSubComment(Long postId, PostSubCommentDto postSubCommentDto) {
-        String callerEmail = getCallerEmailFromSecurityContextHolder();
+        Long callerId = getCallerIdFromSecurityContextHolder();
         BlogPost blogPost = getBlogPostById(postId);
         PostComment postComment = PostComment.builder().build();
         PostSubComment postSubComment = postSubCommentDto.toEntity();
-        User writer = getUserByEmail(callerEmail);
+        User writer = getUserById(callerId);
 
         //연관관계 주입(PostComment)
         postComment.updateBlogPost(blogPost);
@@ -55,9 +56,9 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     @Transactional
     //존재하는 PostComment에 PostSubComment 추가.
     public PostSubCommentDto addPostSubComment(PostSubCommentDto postSubCommentDto) {
-        String callerEmail = getCallerEmailFromSecurityContextHolder();
+        Long callerId = getCallerIdFromSecurityContextHolder();
         PostComment postComment = getPostCommentWithPostSubCommentsById(postSubCommentDto.getPostCommentId());
-        User caller = getUserByEmail(callerEmail);
+        User caller = getUserById(callerId);
 
         PostSubComment postSubComment = postSubCommentDto.toEntity();
         postSubComment.updateUser(caller);
@@ -85,9 +86,9 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     @Override
     @Transactional
     public PostSubCommentDto updatePostSubComment(PostSubCommentDto postSubCommentDto) {
-        String callerEmail = getCallerEmailFromSecurityContextHolder();
+        Long callerId = getCallerIdFromSecurityContextHolder();
         PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentDto.getId());
-        if (validateCaller(postSubComment.getUser().getEmail(),callerEmail)) {
+        if (validateCaller(postSubComment.getUser().getId(),callerId)) {
             return new PostSubCommentDto(postSubComment.updatePostSubComment(postSubCommentDto));
         }else{
             throw new IllegalCallerException("댓글 작성자만 수정할 수 있습니다.");
@@ -98,10 +99,9 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
     @Transactional
     //실제 데이터를 지우지 않고, 유저 연관을 끊고 내용 바꿈, postsubcomment -> user == null
     public void deletePostSubComment(Long postSubCommentId) {
-        String callerEmail = getCallerEmailFromSecurityContextHolder();
+        Long callerId = getCallerIdFromSecurityContextHolder();
         PostSubComment postSubComment = getPostSubCommentWithUserById(postSubCommentId);
-        String commentEmail = postSubComment.getUser().getEmail();
-        if(validateCaller(commentEmail,callerEmail)){
+        if(validateCaller(postSubComment.getUser().getId(),callerId)){
             postSubComment.delete();
         }else{
             throw new IllegalCallerException("댓글 작성자만 삭제할 수 있습니다.");
@@ -117,13 +117,13 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
         return postCommentRepository.findPostCommentWithPostSubCommentsById(id).orElseThrow(()-> new NoSuchElementException("댓글이 존재하지 않습니다."));
     }
 
-    private User getUserByEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+    private User getUserById(Long userId){
+        return userRepository.findById(userId)
+                .orElseGet(()-> syncService.syncUser(userId));
+//                .orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        // TODO: 2022/11/01 orElseGet처리 필요.
     }
 
-    private User getUserById(Long id){
-        return userRepository.findById(id).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-    }
     private PostSubComment getPostSubCommentById(Long postSubCommentId){
         return postSubCommentRepository.findById(postSubCommentId).orElseThrow(()-> new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
         
@@ -133,16 +133,16 @@ public class PostSubCommentServiceImpl implements PostSubCommentService{
         return postSubCommentRepository.findPostSubCommentWithUserById(postSubCommentId).orElseThrow(()-> new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
     }
 
-    private boolean validateCaller(String email, String callerEmail){
-        if(email.equals(callerEmail)){
+    private boolean validateCaller(Long writerId, Long callerId){
+        if(writerId.equals(callerId)){
             return true;
         }else{
             return false;
         }
     }
 
-    private String getCallerEmailFromSecurityContextHolder(){
+    private Long getCallerIdFromSecurityContextHolder(){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user.getEmail();
+        return user.getId();
     }
 }

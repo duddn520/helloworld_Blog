@@ -1,12 +1,17 @@
 package com.helloworldweb.helloworld_guestbook.controller;
 
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
+import com.helloworldweb.helloworld_guestbook.dto.BlogPostPageDto;
 import com.helloworldweb.helloworld_guestbook.model.ApiResponse;
 import com.helloworldweb.helloworld_guestbook.model.HttpResponseMsg;
 import com.helloworldweb.helloworld_guestbook.model.HttpStatusCode;
 import com.helloworldweb.helloworld_guestbook.service.BlogPostService;
 import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,7 +34,7 @@ public class BlogPostController {
             blogPostService.addBlogPost(blogPostDto);
 
             return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
+                    HttpStatusCode.POST_SUCCESS,
                     HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
 
         }catch (ClassCastException e) {
@@ -49,13 +54,15 @@ public class BlogPostController {
 
     //특정 유저가 작성한 모든 BlogPost 조회 후 반환
     @GetMapping("/api/blogpost/all")
-    private ResponseEntity<ApiResponse> getAllBlogPostsByUserId(@RequestParam(name = "user_id") Long userId){
+    private ResponseEntity<ApiResponse> getAllBlogPostsByUserId(@RequestParam(name = "user_id") Long userId,
+                                                                @PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable){
 
-        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(userId);
-
+        int pageNum = blogPostService.getTotalPages(userId, pageable);
+        List<BlogPostDto> blogPostDtos = blogPostService.getAllBlogPosts(userId, pageable);
+        BlogPostPageDto blogPostPageDto = new BlogPostPageDto(blogPostDtos,pageNum);
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
-                HttpResponseMsg.GET_SUCCESS, blogPostDtos), HttpStatus.OK);
+                HttpResponseMsg.GET_SUCCESS, blogPostPageDto), HttpStatus.OK);
 
     }
 

@@ -26,7 +26,7 @@ public class GuestBookController {
             GuestBookDto guestBookDto = guestBookService.addGuestBookComment(userId,guestBookCommentDto);
 
             return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
+                    HttpStatusCode.POST_SUCCESS,
                     HttpResponseMsg.POST_SUCCESS,
                     guestBookDto), HttpStatus.OK);
         }catch(ClassCastException e)
@@ -48,7 +48,7 @@ public class GuestBookController {
         try{
             GuestBookDto guestBookDto = guestBookService.getGuestBook(userId);
             return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
+                    HttpStatusCode.GET_SUCCESS,
                     HttpResponseMsg.GET_SUCCESS,
                     guestBookDto), HttpStatus.OK);
 

@@ -6,6 +6,7 @@ import com.helloworldweb.helloworld_guestbook.dto.GuestBookDto;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
 import com.helloworldweb.helloworld_guestbook.jwt.JwtTokenService;
 import com.helloworldweb.helloworld_guestbook.service.GuestBookService;
+import com.helloworldweb.helloworld_guestbook.service.SyncService;
 import com.helloworldweb.helloworld_guestbook.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -44,22 +45,27 @@ public class GuestBookControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
+    @Autowired
+    SyncService syncService;
+
 
     @Test
     void registerGuestBookComment_Success() throws Exception {
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto callerDto = UserDto.builder()
+                .id(2L)
                 .email("caller@email.com")
                 .build();
 
         UserDto savedDto = userService.addUser(userDto);
         userService.addUser(callerDto);
 
-        String token = jwtTokenService.createToken("caller@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
                 .content("content")
@@ -86,10 +92,12 @@ public class GuestBookControllerTest {
     void registerGuestBookComment_Fail_NoJWT() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto callerDto = UserDto.builder()
+                .id(2L)
                 .email("caller@email.com")
                 .build();
 
@@ -119,12 +127,13 @@ public class GuestBookControllerTest {
     void registerGuestBookComment_Fail_NotExistingUserId() throws Exception{
         //given
         UserDto callerDto = UserDto.builder()
+                .id(1L)
                 .email("caller@email.com")
                 .build();
 
         userService.addUser(callerDto);
 
-        String token = jwtTokenService.createToken("caller@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
                 .content("content")
@@ -150,10 +159,12 @@ public class GuestBookControllerTest {
     void getGuestBook_Success() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -183,10 +194,12 @@ public class GuestBookControllerTest {
     void getGuestBook_Fail_NotExistingUser() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -215,10 +228,12 @@ public class GuestBookControllerTest {
     void updateGuestBookComment_Success() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -234,7 +249,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         GuestBookCommentDto updateCommentDto = GuestBookCommentDto.builder()
                 .id(savedCommentDto.getId())
@@ -261,10 +276,12 @@ public class GuestBookControllerTest {
     void updateGuestBookComment_Fail_NoJWT() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -305,10 +322,12 @@ public class GuestBookControllerTest {
     void updateGuestbookComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -324,7 +343,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         GuestBookCommentDto updateCommentDto = GuestBookCommentDto.builder()
                 .id(savedCommentDto.getId())
@@ -351,10 +370,12 @@ public class GuestBookControllerTest {
     void deleteGuestBookComment_Success() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -370,7 +391,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("123@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(2L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/guestbook")
@@ -389,10 +410,12 @@ public class GuestBookControllerTest {
     void deleteGuestBookComment_Fail_NoJWT() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -423,10 +446,12 @@ public class GuestBookControllerTest {
     void deleteGuestBookComment_Fail_IllegalCaller() throws Exception {
         //given
         UserDto user1Dto = UserDto.builder()
+                .id(1L)
                 .email("email@email.com")
                 .build();
 
         UserDto user2Dto = UserDto.builder()
+                .id(2L)
                 .email("123@email.com")
                 .build();
 
@@ -442,7 +467,7 @@ public class GuestBookControllerTest {
 
         GuestBookCommentDto savedCommentDto = guestBookDto.getGuestBookCommentDtos().get(0);
 
-        String token = jwtTokenService.createToken("email@email.com");
+        String token = jwtTokenService.createToken(String.valueOf(1L));
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/guestbook")

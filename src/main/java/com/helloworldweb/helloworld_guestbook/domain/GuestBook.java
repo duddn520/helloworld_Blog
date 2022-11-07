@@ -27,7 +27,7 @@ public class GuestBook {
     public GuestBook(Long id, User user,List<GuestBookComment> guestBookComments){
         this.id = id;
         this.user = user;
-        this.guestBookComments = guestBookComments;
+        this.guestBookComments = guestBookComments == null ? new ArrayList<>() : guestBookComments;
     }
 
     public void updateUser(User user){

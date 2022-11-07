@@ -1,6 +1,7 @@
 package com.helloworldweb.helloworld_guestbook.dto;
 
 import com.helloworldweb.helloworld_guestbook.domain.BlogPost;
+import com.helloworldweb.helloworld_guestbook.domain.PostComment;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,6 @@ import java.util.stream.Collectors;
 @Getter
 public class BlogPostDto {
     private Long id;
-    private Long userId;
     private String title;
     private String content;
     private String tags;
@@ -25,25 +25,34 @@ public class BlogPostDto {
 
     public BlogPostDto(BlogPost blogPost){
         this.id = blogPost.getId();
-        this.userId = blogPost.getUser().getId();
         this.title = blogPost.getTitle();
         this.content = blogPost.getContent();
         this.tags = blogPost.getTags();
         this.searchCount = blogPost.getSearchCount();
         this.views = blogPost.getViews();
         this.userDto = new UserDto(blogPost.getUser());
-        this.postCommentDtos = blogPost.getPostComments() == null? new ArrayList<>() : blogPost.getPostComments().stream().map((p) -> new PostCommentDto(p)).collect(Collectors.toList());
+    }
+
+    public BlogPostDto(BlogPost blogPost, List<PostComment> postComments){
+        this.id = blogPost.getId();
+        this.title = blogPost.getTitle();
+        this.content = blogPost.getContent();
+        this.tags = blogPost.getTags();
+        this.searchCount = blogPost.getSearchCount();
+        this.views = blogPost.getViews();
+        this.userDto = new UserDto(blogPost.getUser());
+        this.postCommentDtos = postComments.stream().map((p)->new PostCommentDto(p)).collect(Collectors.toList());
     }
 
     @Builder
-    public BlogPostDto (Long id,Long userId, String title, String content, String tags, Long searchCount, Long views){
+    public BlogPostDto (Long id,String title, String content, String tags, Long searchCount, Long views, UserDto userDto){
         this.id = id;
-        this.userId = userId;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.searchCount = searchCount;
         this.views = views;
+        this.userDto = userDto;
     }
 
     public BlogPost toEntity(){

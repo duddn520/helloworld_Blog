@@ -15,12 +15,11 @@ public class GuestBookDto {
     private Long userId;
     private List<GuestBookCommentDto> guestBookCommentDtos = new ArrayList<>();
 
-    public GuestBookDto(GuestBook guestBook)
+    public GuestBookDto(GuestBook guestBook, List<GuestBookComment> guestBookComments)
     {
         this.id = guestBook.getId();
         this.userId = guestBook.getUser().getId();
-        this.guestBookCommentDtos = guestBook.getGuestBookComments() == null ? new ArrayList<>() :
-                guestBook.getGuestBookComments().stream().map((g)->new GuestBookCommentDto(g)).collect(Collectors.toList());
+        this.guestBookCommentDtos = guestBookComments.stream().map((gc) -> new GuestBookCommentDto(gc)).collect(Collectors.toList());
     }
 
 }

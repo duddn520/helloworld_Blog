@@ -4,6 +4,7 @@ import com.helloworldweb.helloworld_guestbook.domain.BlogPost;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.helloworldweb.helloworld_guestbook.repository.BlogPostRepository;
+import com.helloworldweb.helloworld_guestbook.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,9 @@ public class BlogPostServiceTest {
 
     @Mock
     BlogPostRepository blogPostRepository;
+
+    @Mock
+    UserRepository userRepository;
 
     @InjectMocks
     BlogPostServiceImpl blogPostService;
@@ -73,6 +77,7 @@ public class BlogPostServiceTest {
                 .profileUrl("profileimage")
                 .build();
 
+        when(userRepository.findUserWithBlogPostsByEmail(any(String.class))).thenReturn(Optional.of(user));
         when(blogPostRepository.save(any(BlogPost.class))).then(AdditionalAnswers.returnsFirstArg());
 
         //when
@@ -90,7 +95,7 @@ public class BlogPostServiceTest {
         /**
          * 연관 확인
          */
-        assertThat(retBlogPostDto.getUserId()).isEqualTo(user.getId());
+        assertThat(retBlogPostDto.getUserDto().getId()).isEqualTo(user.getId());
     }
 
 
@@ -113,7 +118,6 @@ public class BlogPostServiceTest {
                 .tags("tags2")
                 .searchCount(3L)
                 .views(3L)
-                .userId(2L)
                 .build();
 
         User user = User. builder()
@@ -174,7 +178,6 @@ public class BlogPostServiceTest {
         BlogPostDto blogPostDto = BlogPostDto.builder()
                 .id(1L)
                 .title("title2")
-                .userId(user.getId())
                 .content("content2")
                 .tags("tags2")
                 .searchCount(2L)

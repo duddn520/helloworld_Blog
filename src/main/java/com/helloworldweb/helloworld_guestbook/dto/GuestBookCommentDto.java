@@ -10,15 +10,13 @@ public class GuestBookCommentDto {
     private Long id;
     private String content;
     private String reply;
-    private Long userId;
-    private Long guestBookId;
+    private UserDto userDto;
 
     public GuestBookCommentDto(GuestBookComment guestBookComment){
         this.id = guestBookComment.getId();
         this.content = guestBookComment.getContent();
         this.reply = guestBookComment.getReply();
-        this.userId = guestBookComment.getUser().getId();
-        this.guestBookId = guestBookComment.getGuestBook().getId();
+        this.userDto = new UserDto(guestBookComment.getUser());
     }
 
     public GuestBookComment toEntity(){
@@ -30,12 +28,11 @@ public class GuestBookCommentDto {
     }
 
     @Builder
-    public GuestBookCommentDto(Long id, String content, String reply, Long userId, Long guestBookId){
+    public GuestBookCommentDto(Long id, String content, String reply, UserDto userDto){
         this.id = id;
         this.content = content;
         this.reply = reply;
-        this.userId = userId;
-        this.guestBookId = guestBookId;
+        this.userDto = userDto;
     }
 
 }

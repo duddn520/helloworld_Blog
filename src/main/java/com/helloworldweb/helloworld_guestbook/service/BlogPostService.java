@@ -1,5 +1,6 @@
 package com.helloworldweb.helloworld_guestbook.service;
 
+import com.helloworldweb.helloworld_guestbook.domain.BlogPost;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import org.springframework.data.domain.Pageable;
 
@@ -51,4 +52,5 @@ public interface BlogPostService {
      * @return - 해당 유저가 작성한 블로그 게시글의 총 페이지갯수.
      */
     int getTotalPages(Long userId, Pageable pageable);
+
 }

@@ -34,7 +34,13 @@ public class BlogPostServiceImpl implements BlogPostService{
         Long callerId = getUserIdFromContextHolder();
         User writer = getUserWithBlogPostsByUserId(callerId);
 
-        BlogPost blogPost = blogPostDto.toEntity();
+        BlogPost blogPost = BlogPost.builder()
+                .title(blogPostDto.getTitle())
+                .content(blogPostDto.getContent())
+                .tags(blogPostDto.getTags())
+                .views(0L)
+                .searchCount(0L)
+                .build();
         blogPost.updateUser(writer);
         return new BlogPostDto(blogPostRepository.save(blogPost));
 
@@ -43,9 +49,10 @@ public class BlogPostServiceImpl implements BlogPostService{
     // FetchJoin 시 post - fetch - postcomment , 이후 지연로딩 (batchSize조절)
     @Override
     @Transactional
-    //댓글, 대댓글, 대댓글을 단 user 모두 표시해야하기 때문에 지연로딩 필요.
+    //댓글, 대댓글, 대댓글을 단 user 모두 표시해야하기 때문에 지연로딩 필요, 조회수 update해야하므로 지연로딩 필요.
     public BlogPostDto getBlogPost(Long id){
         BlogPost blogPost = getBlogPostWithUserByID(id);
+        blogPost.updateView();
         return new BlogPostDto(blogPost, blogPost.getPostComments() );
     }
 

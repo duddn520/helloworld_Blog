@@ -62,4 +62,8 @@ public class BlogPost extends BaseEntity{
         this.searchCount = blogPostDto.getSearchCount();
         this.views = blogPostDto.getViews();
     }
+
+    public void updateView() {
+        this.views = this.views + 1L;
+    }
 }

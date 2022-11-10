@@ -1,5 +1,6 @@
 package com.helloworldweb.helloworld_guestbook.service;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -44,19 +45,18 @@ public class SyncService {
         }
         String userData = responseEntity.getBody().getData().toString();
 
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(userData);
+        JsonElement element = JsonParser.parseString(userData);
         JsonObject object = element.getAsJsonObject();
 
         Long id = object.get("id").getAsLong();
-        String email = object.get("email").isJsonNull()? null : object.get("email").getAsString();
-        String socialAccountId = object.get("socialAccountId").isJsonNull()? null: object.get("socialAccountId").getAsString();
-        String nickName = object.get("nickName").isJsonNull()? null: object.get("nickName").getAsString();
-        String profileUrl = object.get("profileUrl").isJsonNull()?null:object.get("profileUrl").getAsString();
-        String repoUrl = object.get("repoUrl").isJsonNull()? null: object.get("repoUrl").getAsString();
-        String profileMusicName = object.get("profileMusicName").isJsonNull()? null: object.get("profileMusicName").getAsString();
-        String profileMusicUrl = object.get("profileMusicUrl").isJsonNull()? null: object.get("profileMusicUrl").getAsString();
-        String fcm = object.get("fcm").isJsonNull()? null : object.get("fcm").getAsString();
+        String email = object.has("email") ? object.get("email").getAsString(): null;
+        String socialAccountId = object.has("socialAccountId")? object.get("socialAccountId").getAsString():null;
+        String nickName = object.has("nickName")? object.get("nickName").getAsString():null;
+        String profileUrl = object.has("profileUrl")?object.get("profileUrl").getAsString():null;
+        String repoUrl = object.has("repoUrl") ? object.get("repoUrl").getAsString() : null;
+        String profileMusicName = object.has("profileMusicName")?object.get("profileMusicName").getAsString():null;
+        String profileMusicUrl = object.has("profileMusicUrl")? object.get("profileMusicUrl").getAsString():null;
+        String fcm = object.has("fcm")?object.get("fcm").getAsString():null;
 
         UserDto userDto = UserDto.builder()
                 .id(id)

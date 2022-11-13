@@ -33,17 +33,15 @@
 
 **PostServer**
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5f91e535-02ef-42e1-98f5-9e147b418869/Untitled.png)
-
+<img src="./img/PostServer.png">
 **BlogServer**
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d97f74e2-534c-43c6-89b8-7891f7646654/Untitled.png)
-
+<img src="./img/BlogServer.png">
 ---
 
 ### 서비스 아키텍처(예정)
 
-![스크린샷 2022-11-12 오후 8.44.46.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/44ed6fe8-1d97-4d8b-a57e-8299cee29205/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2022-11-12_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_8.44.46.png)
+<img src="./img/HelloWorldWeb-Architecture.png">
 
 ---
 

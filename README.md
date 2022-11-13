@@ -29,7 +29,7 @@
 
 **UserServer**
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/645a3981-4d66-4efe-aad1-8b1f5c316c4b/Untitled.png)
+![Untitled]("./img/UserServer.png")
 
 **PostServer**
 

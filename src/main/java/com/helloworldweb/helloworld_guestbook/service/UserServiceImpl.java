@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final SyncService syncService;
     private final JwtTokenService jwtTokenService;
 
     @Override
@@ -55,6 +56,6 @@ public class UserServiceImpl implements UserService{
 
 
     private User getUserById(Long userId){
-        return userRepository.findById(userId).orElseThrow(()-> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+        return userRepository.findById(userId).orElseGet(()-> syncService.syncUser(userId));
     }
 }

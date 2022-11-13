@@ -41,20 +41,21 @@ public class Consumer {
         ack.acknowledge();
 
     }
+
     private UserDto messageToUserDto(String jsonString ){
         JsonParser jsonParser = new JsonParser();
         JsonElement element = jsonParser.parse(jsonString);
         JsonObject object = element.getAsJsonObject();
 
         Long id = object.get("id").getAsLong();
-        String email = object.get("email").isJsonNull()? null : object.get("email").getAsString();
-        String socialAccountId = object.get("socialAccountId").isJsonNull()? null: object.get("socialAccountId").getAsString();
-        String nickName = object.get("nickName").isJsonNull()? null: object.get("nickName").getAsString();
-        String profileUrl = object.get("profileUrl").isJsonNull()?null:object.get("profileUrl").getAsString();
-//        String repoUrl = object.get("repoUrl").isJsonNull()? null: object.get("repoUrl").getAsString();
-//        String profileMusicName = object.get("profileMusicName").isJsonNull()? null: object.get("profileMusicName").getAsString();
-//        String profileMusicUrl = object.get("profileMusicUrl").isJsonNull()? null: object.get("profileMusicUrl").getAsString();
-//        String fcm = object.get("fcm").isJsonNull()? null : object.get("fcm").getAsString();
+        String email = object.has("email") ? object.get("email").getAsString(): null;
+        String socialAccountId = object.has("socialAccountId")? object.get("socialAccountId").getAsString():null;
+        String nickName = object.has("nickName")? object.get("nickName").getAsString():null;
+        String profileUrl = object.has("profileUrl")?object.get("profileUrl").getAsString():null;
+        String repoUrl = object.has("repoUrl") ? object.get("repoUrl").getAsString() : null;
+        String profileMusicName = object.has("profileMusicName")?object.get("profileMusicName").getAsString():null;
+        String profileMusicUrl = object.has("profileMusicUrl")? object.get("profileMusicUrl").getAsString():null;
+        String fcm = object.has("fcm")?object.get("fcm").getAsString():null;
 
         UserDto userDto = UserDto.builder()
                 .id(id)
@@ -62,10 +63,10 @@ public class Consumer {
                 .socialAccountId(socialAccountId)
                 .nickName(nickName)
                 .profileUrl(profileUrl)
-//                .repoUrl(repoUrl)
-//                .profileMusicUrl(profileMusicUrl)
-//                .profileMusicName(profileMusicName)
-//                .fcm(fcm)
+                .repoUrl(repoUrl)
+                .profileMusicUrl(profileMusicUrl)
+                .profileMusicName(profileMusicName)
+                .fcm(fcm)
                 .build();
 
         return userDto;

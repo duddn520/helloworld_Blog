@@ -20,27 +20,42 @@ public class Consumer {
     private final UserService userService;
 
 
-    @KafkaListener(topics = "user_register",groupId = "user_register_guestbook")
-    public void userRegisterListener(String dtoString, Acknowledgment ack){
-        System.out.println("dtoString = " + dtoString);
-        userService.addUser(messageToUserDto(dtoString));
+    @KafkaListener(topics = "user_server")
+    public void userServerListener(String dtoString, Acknowledgment ack){
+
+        String op = getOpertaion(dtoString);
+
+        switch (op){
+            case "register":
+                userService.addUser(messageToUserDto(dtoString));
+                break;
+            case "update":
+                userService.updateUser(messageToUserDto(dtoString));
+                break;
+            case "delete":
+                userService.deleteUser(getId(dtoString));
+                break;
+            default:
+                throw new IllegalArgumentException("존재하지 않는 작업입니다.");
+        }
         ack.acknowledge();
 
     }
 
-    @KafkaListener(topics = "user_update", groupId = "user_update_guestbook")
-    public void userUpdateListener(String dtoString, Acknowledgment ack){
-        userService.updateUser(messageToUserDto(dtoString));
-        ack.acknowledge();
-
-    }
-
-    @KafkaListener(topics = "user_delete", groupId = "user_delete_guestbook")
-    public void userDeleteListener(String dtoString, Acknowledgment ack){
-        userService.deleteUser(messageToUserDto(dtoString).getId());
-        ack.acknowledge();
-
-    }
+//
+//    @KafkaListener(topics = "user_update", groupId = "user_update_guestbook")
+//    public void userUpdateListener(String dtoString, Acknowledgment ack){
+//        userService.updateUser(messageToUserDto(dtoString));
+//        ack.acknowledge();
+//
+//    }
+//
+//    @KafkaListener(topics = "user_delete", groupId = "user_delete_guestbook")
+//    public void userDeleteListener(String dtoString, Acknowledgment ack){
+//        userService.deleteUser(messageToUserDto(dtoString).getId());
+//        ack.acknowledge();
+//
+//    }
 
     private UserDto messageToUserDto(String jsonString ){
         JsonParser jsonParser = new JsonParser();
@@ -70,6 +85,24 @@ public class Consumer {
                 .build();
 
         return userDto;
+    }
+
+    private String getOpertaion(String jsonString)
+    {
+        JsonParser jsonParser = new JsonParser();
+        JsonElement element = jsonParser.parse(jsonString);
+        JsonObject object = element.getAsJsonObject();
+
+        return object.get("operation").getAsString();
+
+    }
+
+    private Long getId(String jsonString){
+        JsonParser jsonParser = new JsonParser();
+        JsonElement element = jsonParser.parse(jsonString);
+        JsonObject object = element.getAsJsonObject();
+
+        return object.get("Id").getAsLong();
     }
 
 

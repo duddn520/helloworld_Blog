@@ -23,6 +23,8 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 @SpringBootTest
@@ -81,7 +83,7 @@ public class PostSubCommentControllerTest {
                 .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when
@@ -160,7 +162,7 @@ public class PostSubCommentControllerTest {
                 .post("/api/postsubcomment/new")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when
@@ -211,7 +213,7 @@ public class PostSubCommentControllerTest {
                 .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when
@@ -309,7 +311,7 @@ public class PostSubCommentControllerTest {
                 .post("/api/postsubcomment/new")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when
@@ -519,7 +521,7 @@ public class PostSubCommentControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
@@ -615,7 +617,7 @@ public class PostSubCommentControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
@@ -664,7 +666,7 @@ public class PostSubCommentControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
@@ -706,7 +708,7 @@ public class PostSubCommentControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
                 .param("postsubcomment_id",String.valueOf(savedSubCommentDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -783,7 +785,7 @@ public class PostSubCommentControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
                 .param("postsubcomment_id",String.valueOf(999L))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -823,7 +825,7 @@ public class PostSubCommentControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
                 .param("postsubcomment_id",String.valueOf(savedSubCommentDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)

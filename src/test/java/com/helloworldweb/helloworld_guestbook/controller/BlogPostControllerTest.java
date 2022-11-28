@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -73,9 +75,10 @@ public class BlogPostControllerTest {
 
         String json = new ObjectMapper().writeValueAsString(blogPostDto);
 
+        Cookie cookie = new Cookie("Auth",token);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/blogpost")
-                .header("Auth",token)
+                .cookie(cookie)
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
         //when
@@ -170,10 +173,10 @@ public class BlogPostControllerTest {
                 .build();
 
         String json1 = new ObjectMapper().writeValueAsString(blogPostDto1);
-
+        Cookie cookie = new Cookie("Auth",token);
         RequestBuilder requestBuilder1 = MockMvcRequestBuilders
                 .post("/api/blogpost")
-                .header("Auth",token)
+                .cookie(cookie)
                 .content(json1)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -188,7 +191,7 @@ public class BlogPostControllerTest {
 
         RequestBuilder requestBuilder2 = MockMvcRequestBuilders
                 .post("/api/blogpost")
-                .header("Auth",token)
+                .cookie(cookie)
                 .content(json2)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -219,10 +222,12 @@ public class BlogPostControllerTest {
 
         String token = jwtTokenService.createToken(String.valueOf(1L));
 
+        Cookie cookie = new Cookie("Auth",token);
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/blogpost/all")
                 .param("user_id",String.valueOf(savedUser.getId()))
-                .header("Auth",token);
+                .cookie(cookie);
         //when
         mvc.perform(requestBuilder)
                 //then
@@ -250,10 +255,12 @@ public class BlogPostControllerTest {
 
         BlogPostDto savedDto  = blogPostService.addBlogPost(blogPostDto);
 
+        Cookie cookie = new Cookie("Auth",token);
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/blogpost")
                 .param("blogpost_id",String.valueOf(savedDto.getId()))
-                .header("Auth",token);
+                .cookie(cookie);
         //when
         mvc.perform(requestBuilder)
                 //then
@@ -278,7 +285,7 @@ public class BlogPostControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/blogpost")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .param("blogpost_id",String.valueOf(999L));
         //when
         mvc.perform(requestBuilder)
@@ -322,7 +329,7 @@ public class BlogPostControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/blogpost")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -370,7 +377,7 @@ public class BlogPostControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/blogpost")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -397,7 +404,7 @@ public class BlogPostControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/blogpost")
                 .param("blogpost_id",String.valueOf(999L))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -429,7 +436,7 @@ public class BlogPostControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/blogpost")
                 .param("blogpost_id",String.valueOf(savedDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -462,7 +469,7 @@ public class BlogPostControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/blogpost")
                 .param("blogpost_id",String.valueOf(savedDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -488,7 +495,7 @@ public class BlogPostControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/blogpost")
                 .param("blogpost_id",String.valueOf(999L))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)

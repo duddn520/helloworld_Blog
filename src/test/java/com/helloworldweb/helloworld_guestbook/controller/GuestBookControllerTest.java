@@ -1,6 +1,8 @@
 package com.helloworldweb.helloworld_guestbook.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.helloworldweb.helloworld_guestbook.domain.GuestBook;
+import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.GuestBookCommentDto;
 import com.helloworldweb.helloworld_guestbook.dto.GuestBookDto;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,8 +26,15 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+
+import java.util.NoSuchElementException;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -45,7 +55,7 @@ public class GuestBookControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
-    @Autowired
+    @MockBean
     SyncService syncService;
 
 
@@ -76,7 +86,7 @@ public class GuestBookControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/guestbook")
                 .param("user_id",String.valueOf(savedDto.getId()))
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -124,7 +134,7 @@ public class GuestBookControllerTest {
     }
 
     @Test
-    void registerGuestBookComment_Fail_NotExistingUserId() throws Exception{
+    void registerGuestBookComment_Fail_SyncFail() throws Exception{
         //given
         UserDto callerDto = UserDto.builder()
                 .id(1L)
@@ -144,14 +154,53 @@ public class GuestBookControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/guestbook")
                 .param("user_id",String.valueOf(999L))
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
+
+        given(syncService.syncUser(any(Long.class))).willThrow(new NoSuchElementException());
 
         //when
         mvc.perform(requestBuilder)
         //then
                 .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
+    void registerGuestBookComment_Fail_SyncSuccess() throws Exception{
+        //given
+        UserDto callerDto = UserDto.builder()
+                .id(1L)
+                .email("caller@email.com")
+                .build();
+
+        userService.addUser(callerDto);
+
+        String token = jwtTokenService.createToken(String.valueOf(999L));
+
+        GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
+                .content("content")
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(guestBookCommentDto);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/guestbook")
+                .param("user_id",String.valueOf(999L))
+                .cookie(new Cookie("Auth",token))
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+        GuestBook guestBook = GuestBook.builder().id(2L).build();
+        User syncedUser =User.builder()
+                .id(999L).build();
+        syncedUser.updateGuestBook(guestBook);
+        given(syncService.syncUser(any(Long.class))).willReturn(syncedUser);
+
+        //when
+        mvc.perform(requestBuilder)
+                //then
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 
@@ -190,39 +239,39 @@ public class GuestBookControllerTest {
 
     }
 
-    @Test
-    void getGuestBook_Fail_NotExistingUser() throws Exception {
-        //given
-        UserDto user1Dto = UserDto.builder()
-                .id(1L)
-                .email("email@email.com")
-                .build();
-
-        UserDto user2Dto = UserDto.builder()
-                .id(2L)
-                .email("123@email.com")
-                .build();
-
-        UserDto savedDto = userService.addUser(user1Dto);
-        userService.addUser(user2Dto);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user2Dto.toEntity(),"",user2Dto.toEntity().getAuthorities()));
-
-        GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
-                .content("content1")
-                .build();
-
-        guestBookService.addGuestBookComment(savedDto.getId(),guestBookCommentDto);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/api/guestbook")
-                .param("user_id",String.valueOf(999L));
-
-        //when
-        mvc.perform(requestBuilder)
-        //then
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
-    }
+//    @Test
+//    void getGuestBook_Fail_NotExistingUser() throws Exception {
+//        //given
+//        UserDto user1Dto = UserDto.builder()
+//                .id(1L)
+//                .email("email@email.com")
+//                .build();
+//
+//        UserDto user2Dto = UserDto.builder()
+//                .id(2L)
+//                .email("123@email.com")
+//                .build();
+//
+//        UserDto savedDto = userService.addUser(user1Dto);
+//        userService.addUser(user2Dto);
+//        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user2Dto.toEntity(),"",user2Dto.toEntity().getAuthorities()));
+//
+//        GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
+//                .content("content1")
+//                .build();
+//
+//        guestBookService.addGuestBookComment(savedDto.getId(),guestBookCommentDto);
+//
+//        RequestBuilder requestBuilder = MockMvcRequestBuilders
+//                .get("/api/guestbook")
+//                .param("user_id",String.valueOf(999L));
+//
+//        //when
+//        mvc.perform(requestBuilder)
+//        //then
+//                .andExpect(status().is4xxClientError())
+//                .andDo(print());
+//    }
 
     @Test
     void updateGuestBookComment_Success() throws Exception {
@@ -261,7 +310,7 @@ public class GuestBookControllerTest {
         String json = new ObjectMapper().writeValueAsString(updateCommentDto);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/guestbook")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -355,7 +404,7 @@ public class GuestBookControllerTest {
         String json = new ObjectMapper().writeValueAsString(updateCommentDto);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/guestbook")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -396,7 +445,7 @@ public class GuestBookControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/guestbook")
                 .param("guestbook_comment_id",String.valueOf(savedCommentDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -472,7 +521,7 @@ public class GuestBookControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/guestbook")
                 .param("guestbook_comment_id",String.valueOf(savedCommentDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)

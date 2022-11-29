@@ -1,6 +1,7 @@
 package com.helloworldweb.helloworld_guestbook.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
 import com.helloworldweb.helloworld_guestbook.dto.PostSubCommentDto;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
@@ -14,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,8 +25,16 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+
+import java.util.NoSuchElementException;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
@@ -47,7 +57,7 @@ public class PostSubCommentControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
-    @Autowired
+    @MockBean
     SyncService syncService;
 
     @Test
@@ -81,7 +91,7 @@ public class PostSubCommentControllerTest {
                 .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when
@@ -129,7 +139,7 @@ public class PostSubCommentControllerTest {
     }
 
     @Test
-    void createPostSubComment_Fail_NotFoundUser() throws Exception {
+    void createPostSubComment_Fail_SyncFail() throws Exception {
         //given
         //user 회원가입 및 blogPost 작성.
         UserDto userDto = UserDto.builder()
@@ -157,16 +167,61 @@ public class PostSubCommentControllerTest {
         //등록되지 않은 유저의 ID를 담은 jwt 요청
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/postsubcomment/new")
+                .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
+        given(syncService.syncUser(any(Long.class))).willThrow(new NoSuchElementException());
         //when
         mvc.perform(requestBuilder)
                 //then
                 .andExpect(status().is4xxClientError())
+                .andDo(print());
+
+    }
+
+    @Test
+    void createPostSubComment_Fail_SyncSuccess() throws Exception {
+        //given
+        //user 회원가입 및 blogPost 작성.
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .email("email@email.com")
+                .build();
+
+        userService.addUser(userDto);
+
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDto.toEntity(),"",userDto.toEntity().getAuthorities()));
+
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .content("content")
+                .title("title")
+                .build();
+
+        BlogPostDto savedBlogPostDto = blogPostService.addBlogPost(blogPostDto);
+
+        PostSubCommentDto postSubCommentDto = PostSubCommentDto.builder()
+                .content("subcomment!!!!!")
+                .build();
+        String json = new ObjectMapper().writeValueAsString(postSubCommentDto);
+
+        String token = jwtTokenService.createToken(String.valueOf(2L));
+        //등록되지 않은 유저의 ID를 담은 jwt 요청
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/postsubcomment")
+                .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
+                .content(json)
+                .cookie(new Cookie("Auth",token))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        given(syncService.syncUser(any(Long.class))).willReturn(User.builder().id(2L).build());
+        //when
+        mvc.perform(requestBuilder)
+                //then
+                .andExpect(status().isOk())
                 .andDo(print());
 
     }
@@ -211,7 +266,7 @@ public class PostSubCommentControllerTest {
                 .post("/api/postsubcomment")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when
@@ -309,7 +364,7 @@ public class PostSubCommentControllerTest {
                 .post("/api/postsubcomment/new")
                 .param("blogpost_id",String.valueOf(savedBlogPostDto.getId()))
                 .content(json)
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when
@@ -519,7 +574,7 @@ public class PostSubCommentControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
@@ -615,7 +670,7 @@ public class PostSubCommentControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
@@ -664,7 +719,7 @@ public class PostSubCommentControllerTest {
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/postsubcomment")
-                .header("Auth",token)
+                .cookie(new Cookie("Auth",token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
@@ -706,7 +761,7 @@ public class PostSubCommentControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
                 .param("postsubcomment_id",String.valueOf(savedSubCommentDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -783,7 +838,7 @@ public class PostSubCommentControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
                 .param("postsubcomment_id",String.valueOf(999L))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)
@@ -823,7 +878,7 @@ public class PostSubCommentControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/postsubcomment")
                 .param("postsubcomment_id",String.valueOf(savedSubCommentDto.getId()))
-                .header("Auth",token);
+                .cookie(new Cookie("Auth",token));
 
         //when
         mvc.perform(requestBuilder)

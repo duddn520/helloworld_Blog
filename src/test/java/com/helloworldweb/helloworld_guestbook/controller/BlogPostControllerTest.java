@@ -1,5 +1,6 @@
 package com.helloworldweb.helloworld_guestbook.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.BlogPostDto;
@@ -11,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,8 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 
+import java.util.NoSuchElementException;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 
 @SpringBootTest
@@ -51,7 +58,7 @@ public class BlogPostControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
-    @Autowired
+    @MockBean
     SyncService syncService;
 
 
@@ -121,39 +128,77 @@ public class BlogPostControllerTest {
 
 
     //kafka 오류시 처리방향(addUser)
-//    @Test
-//    void registerBlogPost_Fail_NotExistingUser_SyncFailed() throws Exception {
-//        //given
-//        UserDto userDto = UserDto.builder()
-//                .id(1L)
-//                .email("email@email.com")
-//                .build();
-//
-//        userService.addUser(userDto);
-//
-//        String token = jwtTokenService.createToken(String.valueOf(2000000000000000000L));
-//
-//        System.out.println("########################");
-//
-//        BlogPostDto blogPostDto = BlogPostDto.builder()
-//                .content("newcontent1!!!!!!")
-//                .title("title123123123123")
-//                .build();
-//
-//        String json = new ObjectMapper().writeValueAsString(blogPostDto);
-//
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders
-//                .post("/api/blogpost")
-//                .header("Auth",token)
-//                .content(json)
-//                .contentType(MediaType.APPLICATION_JSON);
-//        //when
-//        mvc.perform(requestBuilder)
-//        //then
-//                .andExpect(status().is4xxClientError())
-//                .andDo(print());
-//
-//    }
+    @Test
+    void registerBlogPost_Fail_NotExistingUser_SyncFailed() throws Exception {
+        //given
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .email("email@email.com")
+                .build();
+
+        userService.addUser(userDto);
+
+        String token = jwtTokenService.createToken(String.valueOf(2000000000000000000L));
+
+        System.out.println("########################");
+
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .content("newcontent1!!!!!!")
+                .title("title123123123123")
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(blogPostDto);
+
+        given(syncService.syncUser(any(Long.class))).willThrow(new NoSuchElementException());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/blogpost")
+                .cookie(new Cookie("Auth",token))
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+        //when
+        mvc.perform(requestBuilder)
+        //then
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+
+    }
+
+    @Test
+    void registerBlogPost_Success_NotExistingUser_SyncSuccess() throws Exception {
+        //given
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .email("email@email.com")
+                .build();
+
+        userService.addUser(userDto);
+
+        String token = jwtTokenService.createToken(String.valueOf(1L));
+
+        System.out.println("########################");
+
+        BlogPostDto blogPostDto = BlogPostDto.builder()
+                .content("newcontent1!!!!!!")
+                .title("title123123123123")
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(blogPostDto);
+
+        given(syncService.syncUser(any(Long.class))).willReturn(User.builder().id(1L).build());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/blogpost")
+                .cookie(new Cookie("Auth",token))
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+        //when
+        mvc.perform(requestBuilder)
+                //then
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
 
     @Test
     void getAllBlogPostsByUserId_Success() throws Exception {

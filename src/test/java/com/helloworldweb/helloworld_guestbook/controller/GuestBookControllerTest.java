@@ -1,6 +1,8 @@
 package com.helloworldweb.helloworld_guestbook.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.helloworldweb.helloworld_guestbook.domain.GuestBook;
+import com.helloworldweb.helloworld_guestbook.domain.User;
 import com.helloworldweb.helloworld_guestbook.dto.GuestBookCommentDto;
 import com.helloworldweb.helloworld_guestbook.dto.GuestBookDto;
 import com.helloworldweb.helloworld_guestbook.dto.UserDto;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,8 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 
+import java.util.NoSuchElementException;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -47,7 +55,7 @@ public class GuestBookControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
-    @Autowired
+    @MockBean
     SyncService syncService;
 
 
@@ -125,37 +133,76 @@ public class GuestBookControllerTest {
                 .andDo(print());
     }
 
-//    @Test
-//    void registerGuestBookComment_Fail_NotExistingUserId() throws Exception{
-//        //given
-//        UserDto callerDto = UserDto.builder()
-//                .id(1L)
-//                .email("caller@email.com")
-//                .build();
-//
-//        userService.addUser(callerDto);
-//
-//        String token = jwtTokenService.createToken(String.valueOf(1L));
-//
-//        GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
-//                .content("content")
-//                .build();
-//
-//        String json = new ObjectMapper().writeValueAsString(guestBookCommentDto);
-//
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders
-//                .post("/api/guestbook")
-//                .param("user_id",String.valueOf(999L))
-//                .header("Auth",token)
-//                .content(json)
-//                .contentType(MediaType.APPLICATION_JSON);
-//
-//        //when
-//        mvc.perform(requestBuilder)
-//        //then
-//                .andExpect(status().is4xxClientError())
-//                .andDo(print());
-//    }
+    @Test
+    void registerGuestBookComment_Fail_SyncFail() throws Exception{
+        //given
+        UserDto callerDto = UserDto.builder()
+                .id(1L)
+                .email("caller@email.com")
+                .build();
+
+        userService.addUser(callerDto);
+
+        String token = jwtTokenService.createToken(String.valueOf(1L));
+
+        GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
+                .content("content")
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(guestBookCommentDto);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/guestbook")
+                .param("user_id",String.valueOf(999L))
+                .cookie(new Cookie("Auth",token))
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        given(syncService.syncUser(any(Long.class))).willThrow(new NoSuchElementException());
+
+        //when
+        mvc.perform(requestBuilder)
+        //then
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
+    void registerGuestBookComment_Fail_SyncSuccess() throws Exception{
+        //given
+        UserDto callerDto = UserDto.builder()
+                .id(1L)
+                .email("caller@email.com")
+                .build();
+
+        userService.addUser(callerDto);
+
+        String token = jwtTokenService.createToken(String.valueOf(999L));
+
+        GuestBookCommentDto guestBookCommentDto = GuestBookCommentDto.builder()
+                .content("content")
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(guestBookCommentDto);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/guestbook")
+                .param("user_id",String.valueOf(999L))
+                .cookie(new Cookie("Auth",token))
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+        GuestBook guestBook = GuestBook.builder().id(2L).build();
+        User syncedUser =User.builder()
+                .id(999L).build();
+        syncedUser.updateGuestBook(guestBook);
+        given(syncService.syncUser(any(Long.class))).willReturn(syncedUser);
+
+        //when
+        mvc.perform(requestBuilder)
+                //then
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 
     @Test
     void getGuestBook_Success() throws Exception {

@@ -30,25 +30,11 @@ public class BlogPostController {
     @PostMapping("/api/blogpost")
     private ResponseEntity<ApiResponse> registerBlogPost(@RequestBody BlogPostDto blogPostDto){
 
-        try {
-            blogPostService.addBlogPost(blogPostDto);
+        blogPostService.addBlogPost(blogPostDto);
 
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.POST_SUCCESS,
-                    HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
-
-        }catch (ClassCastException e) {
-            //jwt가 존재하지 않을 떄, Authentication 객체가 ContextHolder에 등록되지 않아 (User) 캐스팅 실패하여 예외 발생.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-
-        }catch (NoSuchElementException e){
-            //jwt에 DB에 존재하지 않는 유저 있을 떄, NoSuchElementException
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NOT_FOUND_USER), HttpStatus.UNAUTHORIZED);
-        }
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
 
     }
 
@@ -69,76 +55,27 @@ public class BlogPostController {
     @GetMapping("/api/blogpost")
     private ResponseEntity<ApiResponse> getBlogPostById(@RequestParam(name = "blogpost_id") Long blogPostId){
 
-        try {
-            BlogPostDto blogPostDto = blogPostService.getBlogPost(blogPostId);
+        BlogPostDto blogPostDto = blogPostService.getBlogPost(blogPostId);
 
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.GET_SUCCESS, blogPostDto), HttpStatus.OK);
-        }catch (NoSuchElementException e){
-            //해당 ID를 갖는 포스트가 존재하지 않는경우.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.BAD_REQUEST,
-                    HttpResponseMsg.NO_CONTENT), HttpStatus.BAD_REQUEST);
-        }
-
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.GET_SUCCESS, blogPostDto), HttpStatus.OK);
     }
 
     @PutMapping("/api/blogpost")
     private ResponseEntity<ApiResponse> updateBlogPost(@RequestBody BlogPostDto blogPostDto){
-        try{
-            BlogPostDto savedDto = blogPostService.updateBlogPost(blogPostDto);
+        BlogPostDto savedDto = blogPostService.updateBlogPost(blogPostDto);
 
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.PUT_SUCCESS, savedDto), HttpStatus.OK);
-        }catch (ClassCastException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-        }
-        catch (IllegalCallerException e){
-            //게시물 작성자와 메소드 요청자가 다른 경우.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.FORBIDDEN), HttpStatus.UNAUTHORIZED);
-        }
-        catch (NoSuchElementException e) {
-            //해당 ID를 갖는 포스트가 존재하지 않는경우.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.BAD_REQUEST,
-                    HttpResponseMsg.NO_CONTENT), HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.PUT_SUCCESS, savedDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/api/blogpost")
     private ResponseEntity<ApiResponse> deleteBlogPost(@RequestParam(name = "blogpost_id") Long blogPostId){
-        try{
-            blogPostService.deleteBlogPost(blogPostId);
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
-        }catch (ClassCastException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-        }
-        catch (IllegalCallerException e){
-            //게시물 작성자와 메소드 요청자가 다른 경우.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.FORBIDDEN), HttpStatus.UNAUTHORIZED);
-        }
-        catch (NoSuchElementException e) {
-            //해당 ID를 갖는 포스트가 존재하지 않는경우.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.BAD_REQUEST,
-                    HttpResponseMsg.NO_CONTENT), HttpStatus.BAD_REQUEST);
-        }
+        blogPostService.deleteBlogPost(blogPostId);
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
     }
-
-
-
-
-
 }

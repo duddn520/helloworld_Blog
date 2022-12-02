@@ -22,91 +22,37 @@ public class GuestBookController {
 
     @PostMapping("/api/guestbook")
     private ResponseEntity<ApiResponse> registerGuestBookComment(@RequestParam(name = "user_id")Long userId,@RequestBody GuestBookCommentDto guestBookCommentDto){
-        try{
-            GuestBookDto guestBookDto = guestBookService.addGuestBookComment(userId,guestBookCommentDto);
-
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.POST_SUCCESS,
-                    HttpResponseMsg.POST_SUCCESS,
-                    guestBookDto), HttpStatus.OK);
-        }catch(ClassCastException e)
-        {
-            //jwt가 존재하지 않을 떄, Authentication 객체가 ContextHolder에 등록되지 않아 (User) 캐스팅 실패하여 예외 발생.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-        }catch(NoSuchElementException e)
-        {
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NOT_FOUND_USER), HttpStatus.UNAUTHORIZED);
-        }
+        GuestBookDto guestBookDto = guestBookService.addGuestBookComment(userId,guestBookCommentDto);
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS,
+                guestBookDto), HttpStatus.OK);
     }
 
     @GetMapping("/api/guestbook")
     private ResponseEntity<ApiResponse> getGuestBook(@RequestParam(name = "user_id")Long userId){
-        try{
-            GuestBookDto guestBookDto = guestBookService.getGuestBook(userId);
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.GET_SUCCESS,
-                    HttpResponseMsg.GET_SUCCESS,
-                    guestBookDto), HttpStatus.OK);
-
-        }catch (NoSuchElementException e)
-        {
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NOT_FOUND_USER), HttpStatus.UNAUTHORIZED);
-        }
+        GuestBookDto guestBookDto = guestBookService.getGuestBook(userId);
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                guestBookDto), HttpStatus.OK);
     }
 
     @PutMapping("/api/guestbook")
     private ResponseEntity<ApiResponse> updateGuestBookComment(@RequestBody GuestBookCommentDto guestBookCommentDto){
-        try{
-            GuestBookCommentDto responseDto = guestBookService.updateGuestBookComment(guestBookCommentDto);
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.PUT_SUCCESS,
-                    responseDto), HttpStatus.OK);
-
-        }catch (ClassCastException e)
-        {
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-        }catch(IllegalCallerException e)
-        {
-            //게시물 작성자와 메소드 요청자가 다른 경우.
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.FORBIDDEN), HttpStatus.UNAUTHORIZED);
-        }catch (NoSuchElementException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.BAD_REQUEST,
-                    HttpResponseMsg.NO_CONTENT), HttpStatus.BAD_REQUEST);
-        }
+        GuestBookCommentDto responseDto = guestBookService.updateGuestBookComment(guestBookCommentDto);
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.PUT_SUCCESS,
+                responseDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/api/guestbook")
     private ResponseEntity<ApiResponse> deleteGuestBookComment(@RequestParam(name = "guestbook_comment_id") Long guestBookCommentId){
-        try{
-            guestBookService.deleteGuestBookComment(guestBookCommentId);
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
-        }catch (ClassCastException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.NO_JWT), HttpStatus.UNAUTHORIZED);
-        }catch (IllegalCallerException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.UNAUTHORIZED,
-                    HttpResponseMsg.FORBIDDEN), HttpStatus.UNAUTHORIZED);
-        }catch (NoSuchElementException e){
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.BAD_REQUEST,
-                    HttpResponseMsg.NO_CONTENT), HttpStatus.BAD_REQUEST);
-        }
+        guestBookService.deleteGuestBookComment(guestBookCommentId);
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
     }
 
 }

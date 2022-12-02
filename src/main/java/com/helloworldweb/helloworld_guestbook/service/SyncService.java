@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.persistence.NoResultException;
 import java.util.NoSuchElementException;
 
 @Service
@@ -41,7 +42,7 @@ public class SyncService {
 
         //UserServer에도 존재하지 않는 유저인 경우, NoSuchElementException.
         if (responseEntity.getStatusCode().value() == 204){
-            throw new NoSuchElementException("해당 유저가 존재하지 않습니다.");
+            throw new NoResultException("해당 유저가 존재하지 않습니다.");
         }
         String userData = responseEntity.getBody().getData().toString();
 

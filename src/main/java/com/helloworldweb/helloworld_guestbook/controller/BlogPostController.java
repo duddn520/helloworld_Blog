@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Controller
+@RequestMapping("/blog")
 @RequiredArgsConstructor
 public class BlogPostController {
 

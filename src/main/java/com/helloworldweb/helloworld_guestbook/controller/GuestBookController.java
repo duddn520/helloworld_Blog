@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
 @Controller
+@RequestMapping("/blog")
 @RequiredArgsConstructor
 public class GuestBookController {
 

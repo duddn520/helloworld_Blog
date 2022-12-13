@@ -50,6 +50,7 @@
 
 - SpringBoot, Gradle
 - Spring Data JPA, H2, MySQL
+- Spring Cloud Gateway, Spring Cloud Eureka
 - AWS EC2, S3, RDS
 - JUnit5, Kafka
 - React
@@ -63,6 +64,7 @@
 - Mockito, Junit, MockMVC를 이용한 단위 및 통합 테스트 작성
 - Kafka를 통한 분산 서버 통신 로직 구현
 - 서버 간 데이터베이스 일관성 및 정합성 유지 로직 구현
+- Spring Cloud Gateway 및 Spring Cloud Eureka 도입
 
 ---
 
@@ -77,6 +79,8 @@
 [Kafka 적용(HelloWorldWeb - MSA)](https://www.notion.so/Kafka-HelloWorldWeb-MSA-402bd468c6ab4116bbf868cdd2c9de7f)
 
 [Consumer → Producer UserDB 동기화](https://www.notion.so/Consumer-Producer-UserDB-5e8367c64fb24c308bc122ca173bd3c6)
+
+[Eureka + Spring Cloud Gateway](https://regal-quill-bc7.notion.site/Eureka-Spring-Cloud-Gateway-03bb9b73780543d89579b516743f218f)
 
 ---
 
